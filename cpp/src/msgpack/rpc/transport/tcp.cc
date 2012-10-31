@@ -29,6 +29,7 @@
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 
+#include <iostream>
 
 namespace msgpack {
 namespace rpc {
@@ -286,7 +287,6 @@ void client_transport::send_data(auto_vreflife vbuf)
 	}
 }
 
-
 class server_socket : public stream_handler<server_socket> {
 public:
 	server_socket(int sock, shared_server svr);
@@ -299,8 +299,14 @@ public:
 	void on_notify(
 			object method, object params, auto_zone z);
 
+        static bool on_server_timeout(mp::shared_ptr<mp::wavy::handler> base_handler,
+                                      weak_server wsvr );
+  int start_server_timeout( weak_server &wsvr );
+  void cancel_server_timeout();
+
 private:
 	weak_server m_svr;
+        int m_timer_id;
 
 private:
 	server_socket();
@@ -329,19 +335,51 @@ private:
 
 server_socket::server_socket(int sock, shared_server svr) :
 	stream_handler<server_socket>(sock, svr->get_loop_ref()),
-	m_svr(svr) { }
+	m_svr(svr),
+        m_timer_id(-1) // FIXME: use separate 'timer_id existence' flag
+{}
 
-server_socket::~server_socket() { }
+server_socket::~server_socket() {
+  cancel_server_timeout();
+}
+
+int server_socket::start_server_timeout( weak_server &wsvr ) {
+  shared_server svr = wsvr.lock();
+  if ( svr && svr->get_server_timeout() > 0 ) {
+    this->m_timer_id = 
+      svr->get_loop_ref()->add_timer( svr->get_server_timeout(),
+                                      0,
+                                      mp::bind(&server_socket::on_server_timeout, shared_from_this(), wsvr));
+  } else {
+    this->m_timer_id = -1;
+  }
+  return this->m_timer_id;
+}
+
+void server_socket::cancel_server_timeout() {
+  if ( m_timer_id != -1 ) {
+    shared_server svr = m_svr.lock();
+    if( svr ) {
+      svr->get_loop_ref()->remove_timer( m_timer_id );
+      m_timer_id = -1;
+    }
+  }
+}
 
 void server_socket::on_request(
 		msgid_t msgid,
 		object method, object params, auto_zone z)
 {
-	shared_server svr = m_svr.lock();
-	if(!svr) {
-		throw closed_exception();
-	}
-	svr->on_request(get_response_sender(), msgid, method, params, z);
+  cancel_server_timeout();
+
+  shared_server svr = m_svr.lock();
+  if(!svr) {
+    throw closed_exception();
+  }
+
+  svr->on_request(get_response_sender(), msgid, method, params, z);
+
+  start_server_timeout( m_svr );
 }
 
 void server_socket::on_notify(
@@ -354,6 +392,17 @@ void server_socket::on_notify(
 	svr->on_notify(method, params, z);
 }
 
+bool server_socket::on_server_timeout( mp::shared_ptr<mp::wavy::handler> base_handler,
+                                       weak_server wsvr ) {
+  shared_server svr = wsvr.lock();
+  if ( svr ) {
+    loop lo = svr->get_loop_ref();
+    server_socket *server_sock = dynamic_cast<server_socket*>(base_handler.get());
+    lo->remove_handler( server_sock->fd());
+  }
+  
+  return true;
+}
 
 server_transport::server_transport(server_impl* svr, const address& addr) :
 	m_lsock(-1), m_loop(svr->get_loop_ref())
@@ -405,13 +454,16 @@ void server_transport::on_accept(int fd, int err, weak_server wsvr)
 	::setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &on, sizeof(on));
 
 	try {
-		svr->get_loop_ref()->add_handler<server_socket>(fd, svr);
+          mp::shared_ptr<server_socket> server_handler =
+            svr->get_loop_ref()->add_handler<server_socket>(fd, svr);
+
+          server_handler->start_server_timeout( wsvr );
+
 	} catch (...) {
 		::close(fd);
 		throw;
 	}
 }
-
 
 }  // noname namespace
 
@@ -446,6 +498,8 @@ std::auto_ptr<server_transport> tcp_listener::listen(server_impl* svr) const
 	return std::auto_ptr<server_transport>(
 			new transport::tcp::server_transport(svr, m_addr));
 }
+
+
 
 
 }  // namespace rpc

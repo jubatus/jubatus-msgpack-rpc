@@ -37,6 +37,9 @@ public:
 
 	void close();
 
+        void set_server_timeout(int sec);
+        int get_server_timeout();
+
 public:
 	void on_request(
 			shared_message_sendable ms, msgid_t msgid,
@@ -48,6 +51,8 @@ public:
 private:
 	dispatcher* m_dp;
 	std::auto_ptr<server_transport> m_stran;
+
+        int m_server_timeout_sec;
 
 private:
 	server_impl();

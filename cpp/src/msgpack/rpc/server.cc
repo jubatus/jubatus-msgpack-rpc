@@ -27,7 +27,8 @@ namespace rpc {
 
 server_impl::server_impl(const builder& b, loop lo) :
 	session_pool_impl(b, lo),
-	m_dp(NULL)
+	m_dp(NULL),
+        m_server_timeout_sec(0)
 { }
 
 server_impl::~server_impl()
@@ -48,6 +49,14 @@ void server_impl::listen(const listener& l)
 void server_impl::close()
 {
 	m_stran.reset();  // FIXME close?
+}
+
+void server_impl::set_server_timeout(int sec) {
+  m_server_timeout_sec = sec;
+}
+
+int server_impl::get_server_timeout() {
+  return m_server_timeout_sec;
 }
 
 void server_impl::on_request(
@@ -94,6 +103,16 @@ void server::listen(const address& addr)
 
 void server::listen(const std::string& host, uint16_t port)
 	{ listen(ip_address(host, port)); }
+
+void server::set_server_timeout(int sec)
+{ 
+  static_cast<server_impl*>(m_pimpl.get())->set_server_timeout(sec);
+}
+
+int server::get_server_timeout()
+{ 
+  return static_cast<server_impl*>(m_pimpl.get())->get_server_timeout();
+}
 
 
 }  // namespace rpc
