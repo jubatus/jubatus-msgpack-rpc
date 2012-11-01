@@ -37,8 +37,8 @@ public:
 
 	void close();
 
-        void set_server_timeout(int sec);
-        int get_server_timeout();
+        void set_server_timeout(double sec);
+        double get_server_timeout();
 
 public:
 	void on_request(
@@ -52,7 +52,7 @@ private:
 	dispatcher* m_dp;
 	std::auto_ptr<server_transport> m_stran;
 
-        int m_server_timeout_sec;
+        double m_server_timeout_sec;
 
 private:
 	server_impl();

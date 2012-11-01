@@ -46,8 +46,8 @@ public:
 
 	void close();
 
-        void set_server_timeout(int sec);
-        int get_server_timeout();
+        void set_server_timeout(double sec);
+        double get_server_timeout();
 
 	class base;
 

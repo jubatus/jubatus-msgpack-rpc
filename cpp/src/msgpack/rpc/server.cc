@@ -51,11 +51,11 @@ void server_impl::close()
 	m_stran.reset();  // FIXME close?
 }
 
-void server_impl::set_server_timeout(int sec) {
+void server_impl::set_server_timeout(double sec) {
   m_server_timeout_sec = sec;
 }
 
-int server_impl::get_server_timeout() {
+double server_impl::get_server_timeout() {
   return m_server_timeout_sec;
 }
 
@@ -104,12 +104,12 @@ void server::listen(const address& addr)
 void server::listen(const std::string& host, uint16_t port)
 	{ listen(ip_address(host, port)); }
 
-void server::set_server_timeout(int sec)
+void server::set_server_timeout(double sec)
 { 
   static_cast<server_impl*>(m_pimpl.get())->set_server_timeout(sec);
 }
 
-int server::get_server_timeout()
+double server::get_server_timeout()
 { 
   return static_cast<server_impl*>(m_pimpl.get())->get_server_timeout();
 }
