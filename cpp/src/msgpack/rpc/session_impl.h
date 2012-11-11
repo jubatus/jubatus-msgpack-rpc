@@ -77,6 +77,8 @@ public:
 
 	void step_timeout();
 	void step_timeout(std::vector<shared_future>* timedout);
+        void cancel( msgid_t msgid );
+        void cancel( msgid_t msgid, object reason );
 
 private:
 	address m_addr;

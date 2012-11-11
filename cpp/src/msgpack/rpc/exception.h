@@ -48,6 +48,13 @@ struct connect_error : timeout_error {
 		timeout_error(msg) {}
 };
 
+struct request_cancelled : rpc_error {
+        request_cancelled() :
+		rpc_error("request cancelled") {}
+
+	request_cancelled(const std::string& msg) :
+		rpc_error(msg) {}
+};
 
 struct call_error : rpc_error {
 	call_error(const std::string& msg) :

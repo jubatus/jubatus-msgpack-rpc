@@ -51,7 +51,7 @@ shared_session session_impl::create(const builder& b, const address addr, loop l
 future session_impl::send_request_impl(msgid_t msgid, sbuffer* sbuf)
 {
 	LOG_DEBUG("sending... msgid=",msgid);
-	shared_future f(new future_impl(shared_from_this(), m_loop));
+	shared_future f(new future_impl(msgid, shared_from_this(), m_loop));
 	m_reqtable.insert(msgid, f);
 
 	m_tran->send_data(sbuf);
@@ -62,7 +62,7 @@ future session_impl::send_request_impl(msgid_t msgid, sbuffer* sbuf)
 future session_impl::send_request_impl(msgid_t msgid, auto_vreflife vbuf)
 {
 	LOG_DEBUG("sending... msgid=",msgid);
-	shared_future f(new future_impl(shared_from_this(), m_loop));
+	shared_future f(new future_impl(msgid, shared_from_this(), m_loop));
 	m_reqtable.insert(msgid, f);
 
 	m_tran->send_data(vbuf);
@@ -105,6 +105,15 @@ void session_impl::step_timeout(std::vector<shared_future>* timedout)
 {
 	LOG_TRACE("step_timeout");
 	m_reqtable.step_timeout(timedout);
+}
+
+void session_impl::cancel( msgid_t msgid ) {
+  cancel(msgid, REQUEST_CANCELLED );
+}
+
+void session_impl::cancel( msgid_t msgid, object reason ) {
+  shared_future f = m_reqtable.take( msgid );
+  if ( f ) f->set_result( object(), reason, auto_zone());
 }
 
 void session_impl::on_connect_failed()

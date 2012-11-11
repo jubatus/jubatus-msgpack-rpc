@@ -106,6 +106,14 @@ void future_impl::set_result(object result, object error, auto_zone z)
 	}
 }
 
+void future_impl::cancel() {
+  if ( m_session ) m_session->cancel( m_msgid );
+}
+
+bool future_impl::is_finished() const
+{
+  return !m_session;
+}
 
 future& future::join()
 {
@@ -152,6 +160,14 @@ const auto_zone& future::zone() const
 	return m_pimpl->zone();
 }
 
+void future::cancel() {
+  m_pimpl->cancel();
+}
+
+bool future::is_finished() const
+{
+  return m_pimpl && m_pimpl->is_finished();
+}
 
 }  // namespace rpc
 }  // namespace msgpack

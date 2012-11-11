@@ -58,6 +58,9 @@ public:
 	future& attach_callback(
 			mp::function<void (future)> func);
 
+        void cancel();
+        bool is_finished() const;
+
 	template <typename T>
 	class type;
 

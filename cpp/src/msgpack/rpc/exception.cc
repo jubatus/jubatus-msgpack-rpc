@@ -26,7 +26,7 @@ namespace rpc {
 
 static const char* TIMEOUT_ERROR_PTR = "request timed out";
 static const char* CONNECT_ERROR_PTR = "connect failed";
-
+static const char* REQUEST_CANCELLED_PTR = "request cancelled";
 
 const msgpack::object TIMEOUT_ERROR( msgpack::type::raw_ref(
 			TIMEOUT_ERROR_PTR, strlen(TIMEOUT_ERROR_PTR)
@@ -36,6 +36,9 @@ const msgpack::object CONNECT_ERROR( msgpack::type::raw_ref(
 			CONNECT_ERROR_PTR, strlen(CONNECT_ERROR_PTR)
 			) );
 
+const msgpack::object REQUEST_CANCELLED( msgpack::type::raw_ref(
+                        REQUEST_CANCELLED_PTR, strlen(REQUEST_CANCELLED_PTR)
+			) );
 
 void throw_exception(future_impl* f)
 {
@@ -48,6 +51,10 @@ void throw_exception(future_impl* f)
 	} else if(err.type == msgpack::type::RAW &&
 			err.via.raw.ptr == CONNECT_ERROR_PTR) {
 		throw connect_error();
+
+        } else if(err.type == msgpack::type::RAW &&
+			err.via.raw.ptr == REQUEST_CANCELLED_PTR) {
+		throw request_cancelled();
 
 	} else if(err.type == msgpack::type::POSITIVE_INTEGER &&
 			err.via.u64 == NO_METHOD_ERROR) {

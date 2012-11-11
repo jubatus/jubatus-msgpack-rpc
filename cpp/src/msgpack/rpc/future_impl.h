@@ -29,7 +29,8 @@ namespace rpc {
 
 class future_impl : public mp::enable_shared_from_this<future_impl> {
 public:
-	future_impl(shared_session s, loop lo) :
+        future_impl(msgid_t msgid, shared_session s, loop lo) :
+                m_msgid(msgid),
 		m_session(s),
 		m_loop(lo),
 		m_timeout(s->get_timeout())  // FIXME
@@ -69,7 +70,11 @@ public:
 		}
 	}
 
+        void cancel();
+        bool is_finished() const;
+
 private:
+        msgid_t m_msgid;
 	shared_session m_session;
 	loop m_loop;
 
