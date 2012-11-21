@@ -40,7 +40,7 @@ public:
 	double connect_timeout() const
 		{ return m_connect_timeout; }
 
-	tcp_builder& reconnct_limit(unsigned int num)
+	tcp_builder& reconnect_limit(unsigned int num)
 		{ m_reconnect_limit = num; return *this; }
 
 	unsigned int reconnect_limit() const
