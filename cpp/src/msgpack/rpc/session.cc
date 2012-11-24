@@ -139,6 +139,32 @@ void session_impl::on_response(msgid_t msgid,
 	f->set_result(result, error, z);
 }
 
+void session_impl::on_connection_closed_error()
+{
+  LOG_TRACE( "read error. connection is already closed" );
+
+  std::vector<shared_future> all;
+  m_reqtable.take_all(&all);
+  for(std::vector<shared_future>::iterator it(all.begin()),
+        it_end(all.end()); it != it_end; ++it) {
+    shared_future& f = *it;
+    f->set_result(object(), CONNECTION_CLOSED_ERROR, auto_zone());
+  }
+}
+
+void session_impl::on_system_error(int system_errno ) {
+  LOG_TRACE( "read error. error=", system_errno );
+
+  msgpack::object system_errno_obj( msgpack::type::fix_int32( -system_errno ) );
+
+  std::vector<shared_future> all;
+  m_reqtable.take_all(&all);
+  for(std::vector<shared_future>::iterator it(all.begin()),
+        it_end(all.end()); it != it_end; ++it) {
+    shared_future& f = *it;
+    f->set_result(object(), system_errno_obj, auto_zone());
+  }
+}
 
 const address& session::get_address() const
 	{ return m_pimpl->get_address(); }

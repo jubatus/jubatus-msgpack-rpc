@@ -61,6 +61,22 @@ struct call_error : rpc_error {
 		rpc_error(msg) {}
 };
 
+struct connection_closed_error : call_error {
+        connection_closed_error() :
+		call_error("connection closed") {}
+
+	connection_closed_error(const std::string& msg) :
+		call_error(msg) {}
+};
+
+struct system_error : call_error {
+        system_error() :
+		call_error("system error") {}
+
+	system_error(const std::string& msg) :
+		call_error(msg) {}
+};
+
 struct no_method_error : call_error {
 	no_method_error() :
 		call_error("method not found") {}

@@ -50,7 +50,9 @@ public:
 	~client_socket();
 
 	void on_response(msgid_t msgid,
-			object result, object error, auto_zone z);
+                         object result, object error, auto_zone z);
+        void on_connection_closed_error();
+        void on_system_error(int system_errno);
 
 private:
 	client_transport* m_tran;
@@ -128,6 +130,31 @@ void client_socket::on_response(msgid_t msgid,
 	s->on_response(msgid, result, error, z);
 }
 
+void client_socket::on_connection_closed_error() {
+  shared_session s = m_session.lock();
+  if(!s) {
+    // throw closed_exception();
+
+    // NOTE: This method is called from inside of catch block.
+    //       To avoid exception from inside of catch block,
+    //       we don't raise exception here.
+    return; 
+  }
+  s->on_connection_closed_error();
+}
+
+void client_socket::on_system_error(int system_errno) {
+  shared_session s = m_session.lock();
+  if(!s) {
+    // throw closed_exception();
+
+    // NOTE: This method is called from inside of catch block.
+    //       To avoid exception from inside of catch block,
+    //       we don't raise exception here.
+    return; 
+  }
+  s->on_system_error(system_errno);
+}
 
 client_transport::client_transport(session_impl* s, const address& addr, const tcp_builder& b) :
 	m_session(s),
@@ -295,6 +322,8 @@ public:
 	void on_request(
 			msgid_t msgid,
 			object method, object params, auto_zone z);
+        void on_connection_closed_error();
+        void on_system_error(int system_errno);
 
 	void on_notify(
 			object method, object params, auto_zone z);
@@ -311,6 +340,9 @@ private:
 private:
 	server_socket();
 	server_socket(const server_socket&);
+
+        void abandan_client_connection();
+        void abandan_client_connection(weak_server wsvr);
 };
 
 
@@ -392,16 +424,32 @@ void server_socket::on_notify(
 	svr->on_notify(method, params, z);
 }
 
+void server_socket::on_connection_closed_error() {
+  abandan_client_connection();
+}
+
+void server_socket::on_system_error(int system_errno) {
+  abandan_client_connection();
+}
+
 bool server_socket::on_server_timeout( mp::shared_ptr<mp::wavy::handler> base_handler,
                                        weak_server wsvr ) {
+  server_socket *server_sock = dynamic_cast<server_socket*>(base_handler.get());
+  server_sock->abandan_client_connection(wsvr);
+  return true;
+}
+
+void server_socket::abandan_client_connection() {
+  abandan_client_connection( m_svr );
+}
+
+void server_socket::abandan_client_connection(weak_server wsvr) {
+  cancel_server_timeout();
   shared_server svr = wsvr.lock();
   if ( svr ) {
     loop lo = svr->get_loop_ref();
-    server_socket *server_sock = dynamic_cast<server_socket*>(base_handler.get());
-    lo->remove_handler( server_sock->fd());
+    lo->remove_handler( this->fd());
   }
-  
-  return true;
 }
 
 server_transport::server_transport(server_impl* svr, const address& addr) :

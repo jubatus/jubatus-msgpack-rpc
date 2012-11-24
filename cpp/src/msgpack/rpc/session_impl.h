@@ -74,6 +74,8 @@ public:
 			object result, object error, auto_zone z);
 
 	void on_connect_failed();
+        void on_connection_closed_error();
+        void on_system_error(int system_errno);
 
 	void step_timeout();
 	void step_timeout(std::vector<shared_future>* timedout);
