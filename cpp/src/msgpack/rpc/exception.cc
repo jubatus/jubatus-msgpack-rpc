@@ -86,6 +86,13 @@ void throw_exception(future_impl* f)
 			err.via.u64 == ARGUMENT_ERROR) {
 		throw argument_error();
 
+        } else if ( err.type == msgpack::type::RAW ) {
+          // maybe simple error message
+          
+          std::ostringstream os;
+          os.write(err.via.raw.ptr, err.via.raw.size);
+          throw remote_error(os.str(), future(f->shared_from_this()));
+
 	} else {
 		std::ostringstream os;
 		os << "remote error: ";
