@@ -81,6 +81,8 @@ public:
 	{
 		throw msgpack::type_error();  // FIXME
 	}
+        void on_connection_closed_error() { } // do nothing
+        void on_system_error(int system_errno ) { } // do nothing
 
 protected:
 	unpacker m_pac;
@@ -226,7 +228,6 @@ inline void dgram_handler<MixIn>::send_data(std::auto_ptr<vreflife> vbuf)
 	sendmsg(fd(), &msg, 0);
 }
 
-
 template <typename MixIn>
 void stream_handler<MixIn>::on_message(object msg, auto_zone z)
 {
@@ -262,7 +263,6 @@ void stream_handler<MixIn>::on_message(object msg, auto_zone z)
 		throw msgpack::type_error();
 	}
 }
-
 
 template <typename MixIn>
 void dgram_handler<MixIn>::on_message(object msg, auto_zone z,
@@ -345,8 +345,13 @@ try {
 	e.remove();
 	return;
 } catch(closed_exception& ex) {
-	e.remove();
-	return;
+  static_cast<MixIn*>(this)->on_connection_closed_error();
+  e.remove();
+  return;
+} catch(mp::system_error &ex) {
+  static_cast<MixIn*>(this)->on_system_error( ex.code );
+  e.remove();
+  return;
 } catch(std::exception& ex) {
 	LOG_WARN("connection: ", ex.what());
 	e.remove();

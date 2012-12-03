@@ -28,6 +28,7 @@ namespace rpc {
 extern const object TIMEOUT_ERROR;
 extern const object CONNECT_ERROR;
 extern const object REQUEST_CANCELLED;
+extern const object CONNECTION_CLOSED_ERROR;
 
 void throw_exception(future_impl* f);
 
