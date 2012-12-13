@@ -152,16 +152,22 @@ future& future::attach_callback(
 
 auto_zone& future::zone()
 {
-	return m_pimpl->zone();
+  if ( !m_pimpl ) {
+    throw std::runtime_error("null future reference");
+  }
+  return m_pimpl->zone();
 }
 
 const auto_zone& future::zone() const
 {
-	return m_pimpl->zone();
+  if ( !m_pimpl ) {
+    throw std::runtime_error("null future reference");
+  }
+  return m_pimpl->zone();
 }
 
 void future::cancel() {
-  m_pimpl->cancel();
+  if ( m_pimpl ) m_pimpl->cancel();
 }
 
 bool future::is_finished() const
