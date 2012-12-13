@@ -26,7 +26,7 @@
 #include <netinet/in.h>
 #include <sys/un.h>
 #include <msgpack.hpp>
-#include <mp/unordered_map.h>
+#include <jubatus/mp/unordered_map.h>
 
 namespace msgpack {
 namespace rpc {

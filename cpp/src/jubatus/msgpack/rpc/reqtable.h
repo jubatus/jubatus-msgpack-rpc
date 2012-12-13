@@ -21,8 +21,8 @@
 #include "protocol.h"
 #include "impl_fwd.h"
 #include <vector>
-#include <mp/unordered_map.h>
-#include <mp/pthread.h>
+#include <jubatus/mp/unordered_map.h>
+#include <jubatus/mp/pthread.h>
 
 namespace msgpack {
 namespace rpc {

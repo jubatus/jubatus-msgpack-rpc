@@ -21,7 +21,7 @@
 #include "types.h"
 #include "loop.h"
 #include "impl_fwd.h"
-#include <mp/functional.h>
+#include <jubatus/mp/functional.h>
 
 namespace msgpack {
 namespace rpc {

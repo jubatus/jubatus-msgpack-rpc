@@ -20,8 +20,8 @@
 
 #include "future.h"
 #include "session_impl.h"
-#include <mp/pthread.h>
-#include <mp/memory.h>
+#include <jubatus/mp/pthread.h>
+#include <jubatus/mp/memory.h>
 
 namespace msgpack {
 namespace rpc {

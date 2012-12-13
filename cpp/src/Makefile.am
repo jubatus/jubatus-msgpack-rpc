@@ -1,4 +1,4 @@
-SUBDIRS = cclog msgpack/rpc
+SUBDIRS = cclog jubatus/msgpack/rpc
 
 doxygen:
 	cat ../Doxyfile > Doxyfile

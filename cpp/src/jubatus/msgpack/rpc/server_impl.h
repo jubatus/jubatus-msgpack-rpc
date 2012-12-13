@@ -20,7 +20,7 @@
 
 #include "server.h"
 #include "session_pool_impl.h"
-#include <mp/utilize.h>
+#include <jubatus/mp/utilize.h>
 
 namespace msgpack {
 namespace rpc {

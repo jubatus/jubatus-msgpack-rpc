@@ -18,7 +18,7 @@
 #ifndef MSGPACK_RPC_IMPL_H__
 #define MSGPACK_RPC_IMPL_H__
 
-#include <mp/memory.h>
+#include <jubatus/mp/memory.h>
 
 namespace msgpack {
 namespace rpc {

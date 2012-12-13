@@ -1,6 +1,6 @@
 #include "echo_server.h"
-#include <msgpack/rpc/server.h>
-#include <msgpack/rpc/client.h>
+#include <jubatus/msgpack/rpc/server.h>
+#include <jubatus/msgpack/rpc/client.h>
 #include <cclog/cclog.h>
 #include <cclog/cclog_tty.h>
 

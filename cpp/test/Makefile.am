@@ -3,9 +3,9 @@ AM_CPPFLAGS   = -I../src
 AM_C_CPPFLAGS = -I../src
 
 AM_LDFLAGS = \
-		../src/cclog/libcclog.la \
-		../src/msgpack/rpc/libmsgpack-rpc.la \
-		-lmpio -msgpack
+		../src/cclog/libjubatus_cclog.la \
+		../src/jubatus/msgpack/rpc/libjubatus_msgpack-rpc.la \
+		-ljubatus_mpio -msgpack
 
 check_HEADERS = \
 		echo_server.h

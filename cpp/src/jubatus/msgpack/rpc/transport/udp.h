@@ -1,5 +1,5 @@
 //
-// msgpack::rpc::transport::unix - MessagePack-RPC for C++
+// msgpack::rpc::transport::udp - MessagePack-RPC for C++
 //
 // Copyright (C) 2009-2010 FURUHASHI Sadayuki
 //
@@ -15,33 +15,33 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-#ifndef MSGPACK_RPC_TRANSPORT_UNIX_H__
-#define MSGPACK_RPC_TRANSPORT_UNIX_H__
+#ifndef MSGPACK_RPC_TRANSPORT_UDP_H__
+#define MSGPACK_RPC_TRANSPORT_UDP_H__
 
 #include "../transport.h"
-#include <mp/functional.h>
-#include <mp/sync.h>
-#include <mp/utilize.h>
+#include <jubatus/mp/functional.h>
+#include <jubatus/mp/sync.h>
+#include <jubatus/mp/utilize.h>
 
 namespace msgpack {
 namespace rpc {
 
 
-class unix_builder : public builder::base<unix_builder> {
+class udp_builder : public builder::base<udp_builder> {
 public:
-	unix_builder();
-	~unix_builder();
+	udp_builder();
+	~udp_builder();
 
 	std::auto_ptr<client_transport> build(session_impl* s, const address& addr) const;
 };
 
 
-class unix_listener : public listener::base<unix_listener> {
+class udp_listener : public listener::base<udp_listener> {
 public:
-	unix_listener(const std::string& path);
-	unix_listener(const address& addr);
+	udp_listener(const std::string& host, uint16_t port);
+	udp_listener(const address& addr);
 
-	~unix_listener();
+	~udp_listener();
 
 	std::auto_ptr<server_transport> listen(server_impl* svr) const;
 
@@ -49,12 +49,12 @@ private:
 	address m_addr;
 
 private:
-	unix_listener();
+	udp_listener();
 };
 
 
 }  // namespace rpc
 }  // namespace msgpack
 
-#endif /* msgpack/rpc/transport/unix.h */
+#endif /* msgpack/rpc/transport/udp.h */
 

@@ -24,7 +24,7 @@
 #include "transport.h"
 #include "impl_fwd.h"
 #include "types.h"
-#include <mp/utilize.h>
+#include <jubatus/mp/utilize.h>
 #include <string>
 
 namespace msgpack {

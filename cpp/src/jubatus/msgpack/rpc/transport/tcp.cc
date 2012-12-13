@@ -19,9 +19,9 @@
 #include "../transport/base.h"
 #include "../transport/tcp.h"
 #include "cclog/cclog.h"
-#include <mp/functional.h>
-#include <mp/sync.h>
-#include <mp/utilize.h>
+#include <jubatus/mp/functional.h>
+#include <jubatus/mp/sync.h>
+#include <jubatus/mp/utilize.h>
 #include <vector>
 
 #include <sys/socket.h>

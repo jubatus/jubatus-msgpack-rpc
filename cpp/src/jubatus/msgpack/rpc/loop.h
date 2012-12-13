@@ -18,8 +18,8 @@
 #ifndef MSGPACK_RPC_LOOP_H__
 #define MSGPACK_RPC_LOOP_H__
 
-#include <mp/wavy.h>
-#include <mp/memory.h>
+#include <jubatus/mp/wavy.h>
+#include <jubatus/mp/memory.h>
 
 namespace msgpack {
 namespace rpc {

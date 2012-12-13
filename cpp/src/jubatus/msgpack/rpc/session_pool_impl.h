@@ -20,8 +20,8 @@
 
 #include "session_pool.h"
 #include "transport_impl.h"
-#include <mp/sync.h>
-#include <mp/unordered_map.h>
+#include <jubatus/mp/sync.h>
+#include <jubatus/mp/unordered_map.h>
 
 namespace msgpack {
 namespace rpc {

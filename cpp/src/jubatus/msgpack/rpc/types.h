@@ -19,7 +19,7 @@
 #define MSGPACK_RPC_TYPES_H__
 
 #include <msgpack.hpp>
-#include <mp/memory.h>
+#include <jubatus/mp/memory.h>
 
 namespace msgpack {
 namespace rpc {

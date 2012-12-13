@@ -20,10 +20,10 @@ function preprocess() {
 }
 
 if [ "$1" == "clean" ];then
-	rm -f src/msgpack/rpc/caller.h
+	rm -f src/jubatus/msgpack/rpc/caller.h
 	rm -f src/cclog/cclog.h
 else
-	preprocess src/msgpack/rpc/caller.hmpl
+	preprocess src/jubatus/msgpack/rpc/caller.hmpl
 	preprocess src/cclog/cclog.hmpl
 fi
 
