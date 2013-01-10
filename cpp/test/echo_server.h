@@ -1,3 +1,5 @@
+// Copyright (C) 2013 Preferred Infrastructure and Nippon Telegraph and Telephone Corporation.
+
 #ifndef ECHO_SERVER_H_
 #define ECHO_SERVER_H_
 

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# Copyright (C) 2013 Preferred Infrastructure and Nippon Telegraph and Telephone Corporation.
+
 RUBY="ruby"
 
 function r() {

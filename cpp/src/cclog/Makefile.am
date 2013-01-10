@@ -1,3 +1,5 @@
+# Copyright (C) 2013 Preferred Infrastructure and Nippon Telegraph and Telephone Corporation.
+
 if WANT_CCLOG
 
 lib_LTLIBRARIES = libjubatus_cclog.la

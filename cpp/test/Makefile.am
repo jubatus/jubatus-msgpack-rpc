@@ -1,3 +1,4 @@
+# Copyright (C) 2013 Preferred Infrastructure and Nippon Telegraph and Telephone Corporation.
 
 AM_CPPFLAGS   = -I../src
 AM_C_CPPFLAGS = -I../src
