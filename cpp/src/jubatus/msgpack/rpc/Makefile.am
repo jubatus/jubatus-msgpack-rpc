@@ -3,7 +3,7 @@
 lib_LTLIBRARIES = libjubatus_msgpack-rpc.la
 
 # -version-info CURRENT:REVISION:AGE
-libjubatus_msgpack_rpc_la_LDFLAGS = -version-info 1:0:0
+libjubatus_msgpack_rpc_la_LDFLAGS = -version-info 4:0:4
 
 libjubatus_msgpack_rpc_includedir = $(includedir)/jubatus/msgpack/rpc
 
