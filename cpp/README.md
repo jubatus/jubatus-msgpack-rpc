@@ -1,5 +1,5 @@
-MessagePack-RPC for C++
-=======================
+jubatus-msgpack-rpc: MessagePack-RPC for C++
+============================================
 
 
 ## Requirements
@@ -8,7 +8,7 @@ Following programs are requred to build:
 
   - gcc >= 4.1 with C++ support
   - [MessagePack for C++](http://msgpack.org/) >= 0.5.2
-  - [mpio](http://github.com/frsyuki/mpio) >= 0.3.5
+  - [jubatus-mpio](http://github.com/jubatus/jubatus-mpio) >= 0.4.0
 
 
 ## Installation
@@ -23,20 +23,20 @@ Configure and install in the usual way:
 
 ## Usage
 
-[Test cases](http://github.com/msgpack/msgpack-rpc/tree/master/cpp/test/) will give you a sample usage.
+[Test cases](http://github.com/jubatus/jubatus-msgpack-rpc/tree/master/cpp/test/) will give you a sample usage.
 
-  - [echo server](http://github.com/msgpack/msgpack-rpc/blob/master/cpp/test/echo_server.h)
-  - [synchronous method call](http://github.com/msgpack/msgpack-rpc/blob/master/cpp/test/sync_call.cc)
-  - [asynchronous method call](http://github.com/msgpack/msgpack-rpc/blob/master/cpp/test/async_call.cc)
-  - [callback-style method call](http://github.com/msgpack/msgpack-rpc/blob/master/cpp/test/callback.cc)
-  - [notify](http://github.com/msgpack/msgpack-rpc/blob/master/cpp/test/notify.cc)
+  - [echo server](http://github.com/jubatus/jubatus-msgpack-rpc/blob/master/cpp/test/echo_server.h)
+  - [synchronous method call](http://github.com/jubatus/jubatus-msgpack-rpc/blob/master/cpp/test/sync_call.cc)
+  - [asynchronous method call](http://github.com/jubatus/jubatus-msgpack-rpc/blob/master/cpp/test/async_call.cc)
+  - [callback-style method call](http://github.com/jubatus/jubatus-msgpack-rpc/blob/master/cpp/test/callback.cc)
+  - [notify](http://github.com/jubatus/jubatus-msgpack-rpc/blob/master/cpp/test/notify.cc)
 
 
 ## Example
 
 ### Simple client
 
-    #include <msgpack/rpc/client.h>
+    #include <jubatus/msgpack/rpc/client.h>
     #include <iostream>
     
     int main(void)
@@ -49,7 +49,7 @@ Configure and install in the usual way:
 
 ### Simple server
 
-    #include <msgpack/rpc/server.h>
+    #include <jubatus/msgpack/rpc/server.h>
     
     class myserver : public msgpack::rpc::server::base {
     public:
