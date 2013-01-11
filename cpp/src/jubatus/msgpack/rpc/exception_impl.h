@@ -1,7 +1,8 @@
 //
-// msgpack::rpc::types - Cluster Communication Framework
+// msgpack::rpc::exception_impl - MessagePack-RPC for C++
 //
-// Copyright (C) 2009-2010 FURUHASHI Sadayuki
+// Copyright (C) 2010 FURUHASHI Sadayuki
+// Copyright (C) 2013 Preferred Infrastructure and Nippon Telegraph and Telephone Corporation.
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -15,36 +16,26 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-#ifndef MSGPACK_RPC_TYPES_H__
-#define MSGPACK_RPC_TYPES_H__
+#ifndef MSGPACK_RPC_EXCEPTION_IMPL_H__
+#define MSGPACK_RPC_EXCEPTION_IMPL_H__
 
-#include <msgpack.hpp>
-#include <mp/memory.h>
+#include "exception.h"
+#include "future_impl.h"
 
 namespace msgpack {
 namespace rpc {
 
 
-typedef std::auto_ptr<zone> auto_zone;
-typedef mp::shared_ptr<zone> shared_zone;
+extern const object TIMEOUT_ERROR;
+extern const object CONNECT_ERROR;
+extern const object REQUEST_CANCELLED;
+extern const object CONNECTION_CLOSED_ERROR;
 
-
-template <typename T>
-class with_shared_zone : public T {
-public:
-	with_shared_zone(shared_zone life) : m_life(life) { }
-	with_shared_zone(const T& c, shared_zone life) : T(c), m_life(life) { }
-	~with_shared_zone() { }
-private:
-	shared_zone m_life;
-private:
-	with_shared_zone();
-	with_shared_zone(const with_shared_zone&);
-};
+void throw_exception(future_impl* f);
 
 
 }  // namespace rpc
 }  // namespace msgpack
 
-#endif /* msgpack/rpc/types.h */
+#endif /* msgpack/rpc/exception_impl.h */
 

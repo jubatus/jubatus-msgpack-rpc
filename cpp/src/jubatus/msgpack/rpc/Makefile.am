@@ -1,13 +1,15 @@
-lib_LTLIBRARIES = libmsgpack-rpc.la
+# Copyright (C) 2013 Preferred Infrastructure and Nippon Telegraph and Telephone Corporation.
+
+lib_LTLIBRARIES = libjubatus_msgpack-rpc.la
 
 # -version-info CURRENT:REVISION:AGE
-libmsgpack_rpc_la_LDFLAGS = -version-info 1:0:0
+libjubatus_msgpack_rpc_la_LDFLAGS = -version-info 4:0:4
 
-libmsgpack_rpc_includedir = $(includedir)/msgpack/rpc
+libjubatus_msgpack_rpc_includedir = $(includedir)/jubatus/msgpack/rpc
 
-libmsgpack_rpc_la_CPPFLAGS = -I../..
+libjubatus_msgpack_rpc_la_CPPFLAGS = -I../../..
 
-libmsgpack_rpc_la_SOURCES = \
+libjubatus_msgpack_rpc_la_SOURCES = \
 		address.cc \
 		client.cc \
 		exception.cc \
@@ -22,7 +24,7 @@ libmsgpack_rpc_la_SOURCES = \
 		transport/unix.cc \
 		version.c
 
-nobase_libmsgpack_rpc_include_HEADERS = \
+nobase_libjubatus_msgpack_rpc_include_HEADERS = \
 		address.h \
 		caller.h \
 		client.h \

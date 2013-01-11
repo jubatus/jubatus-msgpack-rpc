@@ -2,6 +2,7 @@
 // msgpack::rpc::future - MessagePack-RPC for C++
 //
 // Copyright (C) 2010 FURUHASHI Sadayuki
+// Copyright (C) 2013 Preferred Infrastructure and Nippon Telegraph and Telephone Corporation.
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -106,6 +107,14 @@ void future_impl::set_result(object result, object error, auto_zone z)
 	}
 }
 
+void future_impl::cancel() {
+  if ( m_session ) m_session->cancel( m_msgid );
+}
+
+bool future_impl::is_finished() const
+{
+  return !m_session;
+}
 
 future& future::join()
 {
@@ -144,14 +153,28 @@ future& future::attach_callback(
 
 auto_zone& future::zone()
 {
-	return m_pimpl->zone();
+  if ( !m_pimpl ) {
+    throw std::runtime_error("null future reference");
+  }
+  return m_pimpl->zone();
 }
 
 const auto_zone& future::zone() const
 {
-	return m_pimpl->zone();
+  if ( !m_pimpl ) {
+    throw std::runtime_error("null future reference");
+  }
+  return m_pimpl->zone();
 }
 
+void future::cancel() {
+  if ( m_pimpl ) m_pimpl->cancel();
+}
+
+bool future::is_finished() const
+{
+  return m_pimpl && m_pimpl->is_finished();
+}
 
 }  // namespace rpc
 }  // namespace msgpack

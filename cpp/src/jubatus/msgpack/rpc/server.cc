@@ -2,6 +2,7 @@
 // msgpack::rpc::server - MessagePack-RPC for C++
 //
 // Copyright (C) 2010 FURUHASHI Sadayuki
+// Copyright (C) 2013 Preferred Infrastructure and Nippon Telegraph and Telephone Corporation.
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -27,7 +28,8 @@ namespace rpc {
 
 server_impl::server_impl(const builder& b, loop lo) :
 	session_pool_impl(b, lo),
-	m_dp(NULL)
+	m_dp(NULL),
+        m_server_timeout_sec(0)
 { }
 
 server_impl::~server_impl()
@@ -48,6 +50,14 @@ void server_impl::listen(const listener& l)
 void server_impl::close()
 {
 	m_stran.reset();  // FIXME close?
+}
+
+void server_impl::set_server_timeout(double sec) {
+  m_server_timeout_sec = sec;
+}
+
+double server_impl::get_server_timeout() {
+  return m_server_timeout_sec;
 }
 
 void server_impl::on_request(
@@ -94,6 +104,16 @@ void server::listen(const address& addr)
 
 void server::listen(const std::string& host, uint16_t port)
 	{ listen(ip_address(host, port)); }
+
+void server::set_server_timeout(double sec)
+{ 
+  static_cast<server_impl*>(m_pimpl.get())->set_server_timeout(sec);
+}
+
+double server::get_server_timeout()
+{ 
+  return static_cast<server_impl*>(m_pimpl.get())->get_server_timeout();
+}
 
 
 }  // namespace rpc

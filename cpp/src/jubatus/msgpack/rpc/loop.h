@@ -1,7 +1,8 @@
 //
-// msgpack::rpc::exception_impl - MessagePack-RPC for C++
+// msgpack::rpc::loop - MessagePack-RPC for C++
 //
-// Copyright (C) 2010 FURUHASHI Sadayuki
+// Copyright (C) 2009-2010 FURUHASHI Sadayuki
+// Copyright (C) 2013 Preferred Infrastructure and Nippon Telegraph and Telephone Corporation.
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -15,24 +16,25 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-#ifndef MSGPACK_RPC_EXCEPTION_IMPL_H__
-#define MSGPACK_RPC_EXCEPTION_IMPL_H__
+#ifndef MSGPACK_RPC_LOOP_H__
+#define MSGPACK_RPC_LOOP_H__
 
-#include "exception.h"
-#include "future_impl.h"
+#include <jubatus/mp/wavy.h>
+#include <jubatus/mp/memory.h>
 
 namespace msgpack {
 namespace rpc {
 
 
-extern const object TIMEOUT_ERROR;
-extern const object CONNECT_ERROR;
-
-void throw_exception(future_impl* f);
+class loop : public mp::shared_ptr<mp::wavy::loop> {
+public:
+	loop() : mp::shared_ptr<mp::wavy::loop>(new mp::wavy::loop()) { }
+	~loop() { }
+};
 
 
 }  // namespace rpc
 }  // namespace msgpack
 
-#endif /* msgpack/rpc/exception_impl.h */
+#endif /* msgpack/rpc/loop.h */
 

@@ -1,7 +1,8 @@
 //
-// msgpack::rpc::transport::unix - MessagePack-RPC for C++
+// msgpack::rpc::types - Cluster Communication Framework
 //
 // Copyright (C) 2009-2010 FURUHASHI Sadayuki
+// Copyright (C) 2013 Preferred Infrastructure and Nippon Telegraph and Telephone Corporation.
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -15,46 +16,36 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 //
-#ifndef MSGPACK_RPC_TRANSPORT_UNIX_H__
-#define MSGPACK_RPC_TRANSPORT_UNIX_H__
+#ifndef MSGPACK_RPC_TYPES_H__
+#define MSGPACK_RPC_TYPES_H__
 
-#include "../transport.h"
-#include <mp/functional.h>
-#include <mp/sync.h>
-#include <mp/utilize.h>
+#include <msgpack.hpp>
+#include <jubatus/mp/memory.h>
 
 namespace msgpack {
 namespace rpc {
 
 
-class unix_builder : public builder::base<unix_builder> {
+typedef std::auto_ptr<zone> auto_zone;
+typedef mp::shared_ptr<zone> shared_zone;
+
+
+template <typename T>
+class with_shared_zone : public T {
 public:
-	unix_builder();
-	~unix_builder();
-
-	std::auto_ptr<client_transport> build(session_impl* s, const address& addr) const;
-};
-
-
-class unix_listener : public listener::base<unix_listener> {
-public:
-	unix_listener(const std::string& path);
-	unix_listener(const address& addr);
-
-	~unix_listener();
-
-	std::auto_ptr<server_transport> listen(server_impl* svr) const;
-
+	with_shared_zone(shared_zone life) : m_life(life) { }
+	with_shared_zone(const T& c, shared_zone life) : T(c), m_life(life) { }
+	~with_shared_zone() { }
 private:
-	address m_addr;
-
+	shared_zone m_life;
 private:
-	unix_listener();
+	with_shared_zone();
+	with_shared_zone(const with_shared_zone&);
 };
 
 
 }  // namespace rpc
 }  // namespace msgpack
 
-#endif /* msgpack/rpc/transport/unix.h */
+#endif /* msgpack/rpc/types.h */
 

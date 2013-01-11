@@ -2,6 +2,7 @@
 // msgpack::rpc::future - MessagePack-RPC for C++
 //
 // Copyright (C) 2010 FURUHASHI Sadayuki
+// Copyright (C) 2013 Preferred Infrastructure and Nippon Telegraph and Telephone Corporation.
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -21,7 +22,7 @@
 #include "types.h"
 #include "loop.h"
 #include "impl_fwd.h"
-#include <mp/functional.h>
+#include <jubatus/mp/functional.h>
 
 namespace msgpack {
 namespace rpc {
@@ -57,6 +58,9 @@ public:
 
 	future& attach_callback(
 			mp::function<void (future)> func);
+
+        void cancel();
+        bool is_finished() const;
 
 	template <typename T>
 	class type;

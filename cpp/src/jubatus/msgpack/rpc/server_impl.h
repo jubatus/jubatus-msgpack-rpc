@@ -2,6 +2,7 @@
 // msgpack::rpc::server - MessagePack-RPC for C++
 //
 // Copyright (C) 2010 FURUHASHI Sadayuki
+// Copyright (C) 2013 Preferred Infrastructure and Nippon Telegraph and Telephone Corporation.
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -20,7 +21,7 @@
 
 #include "server.h"
 #include "session_pool_impl.h"
-#include <mp/utilize.h>
+#include <jubatus/mp/utilize.h>
 
 namespace msgpack {
 namespace rpc {
@@ -37,6 +38,9 @@ public:
 
 	void close();
 
+        void set_server_timeout(double sec);
+        double get_server_timeout();
+
 public:
 	void on_request(
 			shared_message_sendable ms, msgid_t msgid,
@@ -48,6 +52,8 @@ public:
 private:
 	dispatcher* m_dp;
 	std::auto_ptr<server_transport> m_stran;
+
+        double m_server_timeout_sec;
 
 private:
 	server_impl();

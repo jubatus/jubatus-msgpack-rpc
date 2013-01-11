@@ -2,6 +2,7 @@
 // msgpack::rpc::exception - MessagePack-RPC for C++
 //
 // Copyright (C) 2010 FURUHASHI Sadayuki
+// Copyright (C) 2013 Preferred Infrastructure and Nippon Telegraph and Telephone Corporation.
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -48,10 +49,33 @@ struct connect_error : timeout_error {
 		timeout_error(msg) {}
 };
 
+struct request_cancelled : rpc_error {
+        request_cancelled() :
+		rpc_error("request cancelled") {}
+
+	request_cancelled(const std::string& msg) :
+		rpc_error(msg) {}
+};
 
 struct call_error : rpc_error {
 	call_error(const std::string& msg) :
 		rpc_error(msg) {}
+};
+
+struct connection_closed_error : call_error {
+        connection_closed_error() :
+		call_error("connection closed") {}
+
+	connection_closed_error(const std::string& msg) :
+		call_error(msg) {}
+};
+
+struct system_error : call_error {
+        system_error() :
+		call_error("system error") {}
+
+	system_error(const std::string& msg) :
+		call_error(msg) {}
 };
 
 struct no_method_error : call_error {

@@ -1,5 +1,7 @@
+// Copyright (C) 2013 Preferred Infrastructure and Nippon Telegraph and Telephone Corporation.
+
 #include "echo_server.h"
-#include <mp/pthread.h>
+#include <jubatus/mp/pthread.h>
 #include <iostream>
 #include <numeric>
 #include <stdlib.h>
@@ -7,11 +9,11 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include <cclog/cclog.h>
-#include <msgpack/rpc/server.h>
-#include <msgpack/rpc/client.h>
-#include <msgpack/rpc/transport/tcp.h>
-#include <msgpack/rpc/transport/udp.h>
-#include <msgpack/rpc/transport/unix.h>
+#include <jubatus/msgpack/rpc/server.h>
+#include <jubatus/msgpack/rpc/client.h>
+#include <jubatus/msgpack/rpc/transport/tcp.h>
+#include <jubatus/msgpack/rpc/transport/udp.h>
+#include <jubatus/msgpack/rpc/transport/unix.h>
 
 
 class attacker {

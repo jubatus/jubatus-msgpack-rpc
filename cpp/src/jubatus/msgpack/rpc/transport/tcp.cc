@@ -2,6 +2,7 @@
 // msgpack::rpc::transport::tcp - MessagePack-RPC for C++
 //
 // Copyright (C) 2009-2010 FURUHASHI Sadayuki
+// Copyright (C) 2013 Preferred Infrastructure and Nippon Telegraph and Telephone Corporation.
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -19,9 +20,9 @@
 #include "../transport/base.h"
 #include "../transport/tcp.h"
 #include "cclog/cclog.h"
-#include <mp/functional.h>
-#include <mp/sync.h>
-#include <mp/utilize.h>
+#include <jubatus/mp/functional.h>
+#include <jubatus/mp/sync.h>
+#include <jubatus/mp/utilize.h>
 #include <vector>
 
 #include <sys/socket.h>
@@ -29,6 +30,7 @@
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 
+#include <iostream>
 
 namespace msgpack {
 namespace rpc {
@@ -49,7 +51,9 @@ public:
 	~client_socket();
 
 	void on_response(msgid_t msgid,
-			object result, object error, auto_zone z);
+                         object result, object error, auto_zone z);
+        void on_connection_closed_error();
+        void on_system_error(int system_errno);
 
 private:
 	client_transport* m_tran;
@@ -127,6 +131,31 @@ void client_socket::on_response(msgid_t msgid,
 	s->on_response(msgid, result, error, z);
 }
 
+void client_socket::on_connection_closed_error() {
+  shared_session s = m_session.lock();
+  if(!s) {
+    // throw closed_exception();
+
+    // NOTE: This method is called from inside of catch block.
+    //       To avoid exception from inside of catch block,
+    //       we don't raise exception here.
+    return; 
+  }
+  s->on_connection_closed_error();
+}
+
+void client_socket::on_system_error(int system_errno) {
+  shared_session s = m_session.lock();
+  if(!s) {
+    // throw closed_exception();
+
+    // NOTE: This method is called from inside of catch block.
+    //       To avoid exception from inside of catch block,
+    //       we don't raise exception here.
+    return; 
+  }
+  s->on_system_error(system_errno);
+}
 
 client_transport::client_transport(session_impl* s, const address& addr, const tcp_builder& b) :
 	m_session(s),
@@ -286,7 +315,6 @@ void client_transport::send_data(auto_vreflife vbuf)
 	}
 }
 
-
 class server_socket : public stream_handler<server_socket> {
 public:
 	server_socket(int sock, shared_server svr);
@@ -295,16 +323,27 @@ public:
 	void on_request(
 			msgid_t msgid,
 			object method, object params, auto_zone z);
+        void on_connection_closed_error();
+        void on_system_error(int system_errno);
 
 	void on_notify(
 			object method, object params, auto_zone z);
 
+        static bool on_server_timeout(mp::shared_ptr<mp::wavy::handler> base_handler,
+                                      weak_server wsvr );
+  int start_server_timeout( weak_server &wsvr );
+  void cancel_server_timeout();
+
 private:
 	weak_server m_svr;
+        int m_timer_id;
 
 private:
 	server_socket();
 	server_socket(const server_socket&);
+
+        void abandan_client_connection();
+        void abandan_client_connection(weak_server wsvr);
 };
 
 
@@ -329,19 +368,51 @@ private:
 
 server_socket::server_socket(int sock, shared_server svr) :
 	stream_handler<server_socket>(sock, svr->get_loop_ref()),
-	m_svr(svr) { }
+	m_svr(svr),
+        m_timer_id(-1) // FIXME: use separate 'timer_id existence' flag
+{}
 
-server_socket::~server_socket() { }
+server_socket::~server_socket() {
+  cancel_server_timeout();
+}
+
+int server_socket::start_server_timeout( weak_server &wsvr ) {
+  shared_server svr = wsvr.lock();
+  if ( svr && svr->get_server_timeout() > 0 ) {
+    this->m_timer_id = 
+      svr->get_loop_ref()->add_timer( svr->get_server_timeout(),
+                                      0,
+                                      mp::bind(&server_socket::on_server_timeout, shared_from_this(), wsvr));
+  } else {
+    this->m_timer_id = -1;
+  }
+  return this->m_timer_id;
+}
+
+void server_socket::cancel_server_timeout() {
+  if ( m_timer_id != -1 ) {
+    shared_server svr = m_svr.lock();
+    if( svr ) {
+      svr->get_loop_ref()->remove_timer( m_timer_id );
+      m_timer_id = -1;
+    }
+  }
+}
 
 void server_socket::on_request(
 		msgid_t msgid,
 		object method, object params, auto_zone z)
 {
-	shared_server svr = m_svr.lock();
-	if(!svr) {
-		throw closed_exception();
-	}
-	svr->on_request(get_response_sender(), msgid, method, params, z);
+  cancel_server_timeout();
+
+  shared_server svr = m_svr.lock();
+  if(!svr) {
+    throw closed_exception();
+  }
+
+  svr->on_request(get_response_sender(), msgid, method, params, z);
+
+  start_server_timeout( m_svr );
 }
 
 void server_socket::on_notify(
@@ -354,6 +425,33 @@ void server_socket::on_notify(
 	svr->on_notify(method, params, z);
 }
 
+void server_socket::on_connection_closed_error() {
+  abandan_client_connection();
+}
+
+void server_socket::on_system_error(int system_errno) {
+  abandan_client_connection();
+}
+
+bool server_socket::on_server_timeout( mp::shared_ptr<mp::wavy::handler> base_handler,
+                                       weak_server wsvr ) {
+  server_socket *server_sock = dynamic_cast<server_socket*>(base_handler.get());
+  server_sock->abandan_client_connection(wsvr);
+  return true;
+}
+
+void server_socket::abandan_client_connection() {
+  abandan_client_connection( m_svr );
+}
+
+void server_socket::abandan_client_connection(weak_server wsvr) {
+  cancel_server_timeout();
+  shared_server svr = wsvr.lock();
+  if ( svr ) {
+    loop lo = svr->get_loop_ref();
+    lo->remove_handler( this->fd());
+  }
+}
 
 server_transport::server_transport(server_impl* svr, const address& addr) :
 	m_lsock(-1), m_loop(svr->get_loop_ref())
@@ -405,13 +503,16 @@ void server_transport::on_accept(int fd, int err, weak_server wsvr)
 	::setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &on, sizeof(on));
 
 	try {
-		svr->get_loop_ref()->add_handler<server_socket>(fd, svr);
+          mp::shared_ptr<server_socket> server_handler =
+            svr->get_loop_ref()->add_handler<server_socket>(fd, svr);
+
+          server_handler->start_server_timeout( wsvr );
+
 	} catch (...) {
 		::close(fd);
 		throw;
 	}
 }
-
 
 }  // noname namespace
 
@@ -446,6 +547,8 @@ std::auto_ptr<server_transport> tcp_listener::listen(server_impl* svr) const
 	return std::auto_ptr<server_transport>(
 			new transport::tcp::server_transport(svr, m_addr));
 }
+
+
 
 
 }  // namespace rpc

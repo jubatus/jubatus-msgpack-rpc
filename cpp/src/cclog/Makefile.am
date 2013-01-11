@@ -1,17 +1,19 @@
+# Copyright (C) 2013 Preferred Infrastructure and Nippon Telegraph and Telephone Corporation.
+
 if WANT_CCLOG
 
-lib_LTLIBRARIES = libcclog.la
+lib_LTLIBRARIES = libjubatus_cclog.la
 
-libcclog_la_includedir = $(includedir)/cclog
+libjubatus_cclog_la_includedir = $(includedir)/jubatus/cclog
 
-libcclog_la_SOURCES = \
+libjubatus_cclog_la_SOURCES = \
 		cclog.cc \
 		cclog_null.cc \
 		cclog_ostream.cc \
 		cclog_syslog.cc \
 		cclog_tty.cc
 
-libcclog_la_include_HEADERS = \
+libjubatus_cclog_la_include_HEADERS = \
 		cclog.h \
 		cclog_null.h \
 		cclog_ostream.h \

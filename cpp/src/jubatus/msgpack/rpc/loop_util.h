@@ -2,6 +2,7 @@
 // msgpack::rpc::loop_util - MessagePack-RPC for C++
 //
 // Copyright (C) 2009-2010 FURUHASHI Sadayuki
+// Copyright (C) 2013 Preferred Infrastructure and Nippon Telegraph and Telephone Corporation.
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -43,10 +44,10 @@ public:
 		{ static_cast<MixIn*>(this)->get_loop()->join(); }
 
 	bool is_running() const
-		{ return static_cast<MixIn*>(this)->get_loop()->is_running(); }
+		{ return static_cast<const MixIn*>(this)->get_loop()->is_running(); }
 
 	bool is_end() const
-		{ return static_cast<MixIn*>(this)->get_loop()->is_end(); }
+		{ return static_cast<const MixIn*>(this)->get_loop()->is_end(); }
 };
 
 

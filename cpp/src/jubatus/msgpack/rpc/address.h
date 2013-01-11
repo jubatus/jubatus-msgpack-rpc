@@ -2,6 +2,7 @@
 // msgpack::rpc::address - MessagePack-RPC for C++
 //
 // Copyright (C) 2009-2010 FURUHASHI Sadayuki
+// Copyright (C) 2013 Preferred Infrastructure and Nippon Telegraph and Telephone Corporation.
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -26,7 +27,7 @@
 #include <netinet/in.h>
 #include <sys/un.h>
 #include <msgpack.hpp>
-#include <mp/unordered_map.h>
+#include <jubatus/mp/unordered_map.h>
 
 namespace msgpack {
 namespace rpc {

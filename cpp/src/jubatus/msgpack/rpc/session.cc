@@ -2,6 +2,7 @@
 // msgpack::rpc::session - MessagePack-RPC for C++
 //
 // Copyright (C) 2009-2010 FURUHASHI Sadayuki
+// Copyright (C) 2013 Preferred Infrastructure and Nippon Telegraph and Telephone Corporation.
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -51,7 +52,7 @@ shared_session session_impl::create(const builder& b, const address addr, loop l
 future session_impl::send_request_impl(msgid_t msgid, sbuffer* sbuf)
 {
 	LOG_DEBUG("sending... msgid=",msgid);
-	shared_future f(new future_impl(shared_from_this(), m_loop));
+	shared_future f(new future_impl(msgid, shared_from_this(), m_loop));
 	m_reqtable.insert(msgid, f);
 
 	m_tran->send_data(sbuf);
@@ -62,7 +63,7 @@ future session_impl::send_request_impl(msgid_t msgid, sbuffer* sbuf)
 future session_impl::send_request_impl(msgid_t msgid, auto_vreflife vbuf)
 {
 	LOG_DEBUG("sending... msgid=",msgid);
-	shared_future f(new future_impl(shared_from_this(), m_loop));
+	shared_future f(new future_impl(msgid, shared_from_this(), m_loop));
 	m_reqtable.insert(msgid, f);
 
 	m_tran->send_data(vbuf);
@@ -107,6 +108,15 @@ void session_impl::step_timeout(std::vector<shared_future>* timedout)
 	m_reqtable.step_timeout(timedout);
 }
 
+void session_impl::cancel( msgid_t msgid ) {
+  cancel(msgid, REQUEST_CANCELLED );
+}
+
+void session_impl::cancel( msgid_t msgid, object reason ) {
+  shared_future f = m_reqtable.take( msgid );
+  if ( f ) f->set_result( object(), reason, auto_zone());
+}
+
 void session_impl::on_connect_failed()
 {
 	std::vector<shared_future> all;
@@ -130,6 +140,32 @@ void session_impl::on_response(msgid_t msgid,
 	f->set_result(result, error, z);
 }
 
+void session_impl::on_connection_closed_error()
+{
+  LOG_TRACE( "read error. connection is already closed" );
+
+  std::vector<shared_future> all;
+  m_reqtable.take_all(&all);
+  for(std::vector<shared_future>::iterator it(all.begin()),
+        it_end(all.end()); it != it_end; ++it) {
+    shared_future& f = *it;
+    f->set_result(object(), CONNECTION_CLOSED_ERROR, auto_zone());
+  }
+}
+
+void session_impl::on_system_error(int system_errno ) {
+  LOG_TRACE( "read error. error=", system_errno );
+
+  msgpack::object system_errno_obj( msgpack::type::fix_int32( -system_errno ) );
+
+  std::vector<shared_future> all;
+  m_reqtable.take_all(&all);
+  for(std::vector<shared_future>::iterator it(all.begin()),
+        it_end(all.end()); it != it_end; ++it) {
+    shared_future& f = *it;
+    f->set_result(object(), system_errno_obj, auto_zone());
+  }
+}
 
 const address& session::get_address() const
 	{ return m_pimpl->get_address(); }

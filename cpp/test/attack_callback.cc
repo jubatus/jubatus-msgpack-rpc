@@ -1,8 +1,10 @@
+// Copyright (C) 2013 Preferred Infrastructure and Nippon Telegraph and Telephone Corporation.
+
 #include "attack.h"
 #include <cclog/cclog.h>
 #include <cclog/cclog_tty.h>
 #include <vector>
-#include <mp/functional.h>
+#include <jubatus/mp/functional.h>
 
 static size_t ATTACK_DEPTH;
 static size_t ATTACK_THREAD;

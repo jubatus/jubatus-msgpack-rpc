@@ -1,3 +1,11 @@
+2013-01-11 version 0.4.0
+
+  * Forked from msgpack-rpc
+  * Eliminated zlib dependency
+  * Renamed directory msgpack-rpc -> jubatus/msgpack-rpc
+  * Renamed libmsgpack-rpc -> libjubatus_msgpack-rpc
+  * Add request cancellation feature
+  * Add server timeout feature
 
 2011-02-20 version 0.3.1
 

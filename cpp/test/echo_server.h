@@ -1,7 +1,9 @@
+// Copyright (C) 2013 Preferred Infrastructure and Nippon Telegraph and Telephone Corporation.
+
 #ifndef ECHO_SERVER_H_
 #define ECHO_SERVER_H_
 
-#include <msgpack/rpc/server.h>
+#include <jubatus/msgpack/rpc/server.h>
 
 namespace rpc {
 	using namespace msgpack;

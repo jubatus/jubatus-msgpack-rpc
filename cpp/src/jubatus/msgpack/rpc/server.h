@@ -2,6 +2,7 @@
 // msgpack::rpc::server - MessagePack-RPC for C++
 //
 // Copyright (C) 2010 FURUHASHI Sadayuki
+// Copyright (C) 2013 Preferred Infrastructure and Nippon Telegraph and Telephone Corporation.
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
 //    you may not use this file except in compliance with the License.
@@ -45,6 +46,9 @@ public:
 	void listen(const std::string& host, uint16_t port);
 
 	void close();
+
+        void set_server_timeout(double sec);
+        double get_server_timeout();
 
 	class base;
 

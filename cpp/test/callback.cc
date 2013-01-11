@@ -1,7 +1,9 @@
+// Copyright (C) 2013 Preferred Infrastructure and Nippon Telegraph and Telephone Corporation.
+
 #include "echo_server.h"
-#include <msgpack/rpc/server.h>
-#include <msgpack/rpc/session_pool.h>
-#include <mp/functional.h>
+#include <jubatus/msgpack/rpc/server.h>
+#include <jubatus/msgpack/rpc/session_pool.h>
+#include <jubatus/mp/functional.h>
 #include <cclog/cclog.h>
 #include <cclog/cclog_tty.h>
 
