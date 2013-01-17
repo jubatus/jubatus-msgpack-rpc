@@ -20,7 +20,4 @@ libjubatus_cclog_la_include_HEADERS = \
 		cclog_syslog.h \
 		cclog_tty.h
 
-EXTRA_DIST = \
-		cclog.hmpl
-
 endif
