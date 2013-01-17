@@ -1,3 +1,7 @@
+Current development
+  * Fix configure.in for clang with -O4 option
+  * Update autoconf script for distribution, exclude mplex sources
+
 2013-01-11 version 0.4.0
 
   * Forked from msgpack-rpc
