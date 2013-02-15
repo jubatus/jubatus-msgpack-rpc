@@ -5,7 +5,7 @@ m4_include(m4/ax_check_link_flag.m4)
 AC_CONFIG_AUX_DIR(ac)
 AC_CANONICAL_TARGET
 
-AM_INIT_AUTOMAKE(jubatus_msgpack-rpc, 0.4.0)
+AM_INIT_AUTOMAKE(jubatus_msgpack-rpc, 0.4.0-p1)
 AC_CONFIG_HEADER(config.h)
 
 # Default enabled -O4
