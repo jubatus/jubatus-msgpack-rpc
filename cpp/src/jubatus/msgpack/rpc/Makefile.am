@@ -58,6 +58,5 @@ noinst_HEADERS = \
 		transport/base.h
 
 EXTRA_DIST = \
-		caller.hmpl \
 		version.h.in
 

@@ -1,7 +1,10 @@
 SUBDIRS = src test
 
+EXTRA_DIST = \
+		README.md \
+		LICENSE \
+		NOTICE
+
 doxygen:
-	./preprocess clean
 	cd src && $(MAKE) doxygen
-	./preprocess
 
