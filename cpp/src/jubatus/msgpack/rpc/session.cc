@@ -119,13 +119,7 @@ void session_impl::cancel( msgid_t msgid, object reason ) {
 
 void session_impl::on_connect_failed()
 {
-	std::vector<shared_future> all;
-	m_reqtable.take_all(&all);
-	for(std::vector<shared_future>::iterator it(all.begin()),
-			it_end(all.end()); it != it_end; ++it) {
-		shared_future& f = *it;
-		f->set_result(object(), CONNECT_ERROR, auto_zone());
-	}
+  remove_all_requests( CONNECT_ERROR );
 }
 
 void session_impl::on_response(msgid_t msgid,
@@ -143,28 +137,33 @@ void session_impl::on_response(msgid_t msgid,
 void session_impl::on_connection_closed_error()
 {
   LOG_TRACE( "read error. connection is already closed" );
-
-  std::vector<shared_future> all;
-  m_reqtable.take_all(&all);
-  for(std::vector<shared_future>::iterator it(all.begin()),
-        it_end(all.end()); it != it_end; ++it) {
-    shared_future& f = *it;
-    f->set_result(object(), CONNECTION_CLOSED_ERROR, auto_zone());
-  }
+  remove_all_requests( CONNECTION_CLOSED_ERROR );
 }
 
 void session_impl::on_system_error(int system_errno ) {
   LOG_TRACE( "read error. error=", system_errno );
 
   msgpack::object system_errno_obj( msgpack::type::fix_int32( -system_errno ) );
+  remove_all_requests( system_errno_obj );
+}
 
+void session_impl::remove_all_requests( msgpack::object reason) {
   std::vector<shared_future> all;
   m_reqtable.take_all(&all);
   for(std::vector<shared_future>::iterator it(all.begin()),
         it_end(all.end()); it != it_end; ++it) {
     shared_future& f = *it;
-    f->set_result(object(), system_errno_obj, auto_zone());
+    f->set_result(object(), reason, auto_zone());
   }
+}
+
+void session_impl::open() {
+  close();
+}
+
+void session_impl::close() {
+  remove_all_requests( CONNECTION_CLOSED_ERROR );
+  m_tran->close();
 }
 
 const address& session::get_address() const
@@ -196,6 +195,12 @@ void session::send_notify_impl(std::auto_ptr<with_shared_zone<vrefbuffer> > vbuf
 
 msgid_t session::next_msgid()
 	{ return m_pimpl->next_msgid(); }
+
+void session::open() 
+        { m_pimpl->open(); }
+
+void session::close() 
+        { m_pimpl->close(); }
 
 
 }  // namespace rpc

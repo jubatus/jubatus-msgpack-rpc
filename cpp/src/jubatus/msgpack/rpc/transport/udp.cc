@@ -63,13 +63,19 @@ public:
 public:
 	void send_data(sbuffer* sbuf);
 	void send_data(auto_vreflife vbuf);
+        void close();
 
 private:
 	mp::shared_ptr<client_socket> m_sock;
+        session_impl* m_session;
+        address m_addr;
 
 private:
 	client_transport();
 	client_transport(const client_transport&);
+
+        void try_connect();
+        void close_sock();
 };
 
 
@@ -91,42 +97,58 @@ void client_socket::on_response(msgid_t msgid,
 }
 
 
-client_transport::client_transport(session_impl* s, const address& addr, const udp_builder& b)
-{
-	int sock = ::socket(PF_INET, SOCK_DGRAM, 0);
-	if(sock < 0) {
-		throw mp::system_error(errno, "failed to open UDP socket");
-	}
-
-	try {
-		char addrbuf[addr.get_addrlen()];
-		addr.get_addr((sockaddr*)addrbuf);
-
-		if(::connect(sock, (sockaddr*)addrbuf, sizeof(addrbuf)) < 0) {
-			throw mp::system_error(errno, "failed to connect UDP socket");
-		}
-
-		m_sock = s->get_loop_ref()->add_handler<client_socket>(sock, s);
-
-	} catch(...) {
-		::close(sock);
-		throw;
-	}
+client_transport::client_transport(session_impl* s, const address& addr, const udp_builder& b) :
+  m_session(s),
+  m_addr(addr) {
+  try_connect();
 }
 
 client_transport::~client_transport()
 {
-	m_sock->remove_handler();
+  close_sock();
+}
+
+void client_transport::try_connect() {
+  int sock = ::socket(PF_INET, SOCK_DGRAM, 0);
+  if(sock < 0) {
+    throw mp::system_error(errno, "failed to open UDP socket");
+  }
+
+  try {
+    char addrbuf[m_addr.get_addrlen()];
+    m_addr.get_addr((sockaddr*)addrbuf);
+
+    if(::connect(sock, (sockaddr*)addrbuf, sizeof(addrbuf)) < 0) {
+      throw mp::system_error(errno, "failed to connect UDP socket");
+    }
+
+    m_sock = m_session->get_loop_ref()->add_handler<client_socket>(sock, m_session);
+
+  } catch(...) {
+    ::close(sock);
+    throw;
+  }
+}
+
+void client_transport::close() {
+  close_sock();
+}
+
+void client_transport::close_sock() {
+  m_sock->remove_handler();
+  m_sock.reset();
 }
 
 void client_transport::send_data(sbuffer* sbuf)
 {
-	m_sock->send_data(sbuf);
+  if ( !m_sock ) try_connect();
+  m_sock->send_data(sbuf);
 }
 
 void client_transport::send_data(auto_vreflife vbuf)
 {
-	m_sock->send_data(vbuf);
+  if ( !m_sock ) try_connect();
+  m_sock->send_data(vbuf);
 }
 
 
