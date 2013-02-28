@@ -43,6 +43,9 @@ public:
 	void set_timeout(unsigned int sec);
 	unsigned int get_timeout() const;
 
+        void open();
+        void close();
+
 protected:
 	template <typename Method, typename Parameter>
 	future send_request(Method method,

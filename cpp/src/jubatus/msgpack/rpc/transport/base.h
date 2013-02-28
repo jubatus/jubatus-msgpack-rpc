@@ -269,7 +269,7 @@ template <typename MixIn>
 void dgram_handler<MixIn>::on_message(object msg, auto_zone z,
 		const sockaddr* addrbuf, socklen_t addrlen)
 {
-	msg_rpc rpc;
+        msg_rpc rpc;
 	msg.convert(&rpc);
 
 	switch(rpc.type) {
