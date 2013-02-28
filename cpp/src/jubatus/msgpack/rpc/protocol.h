@@ -39,7 +39,7 @@ static const error_type_t ARGUMENT_ERROR  = 0x02;
 
 
 struct msg_rpc {
-	msg_rpc() { }
+        msg_rpc() : type(REQUEST) { }
 
 	message_type_t type;
 

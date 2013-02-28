@@ -54,7 +54,11 @@ bool MP_UTIL_IMPL(session_pool)::step_timeout(weak_session_pool wsp)
 
 
 session_pool_impl::session_pool_impl(const builder& b, loop lo) :
-	m_loop(lo), m_builder(b.copy()) { }
+  m_loop(lo), 
+  m_builder(b.copy()),
+  m_pool_time_limit_sec( SESSION_POOL_TIME_LIMIT ),
+  m_pool_size_limit(0) {
+}
 
 session_pool_impl::~session_pool_impl() { }
 
@@ -64,12 +68,15 @@ session session_pool_impl::get_session(const address& addr)
 
 	table_t::iterator found = ref->find(addr);
 	if(found != ref->end()) {
-		found->second.ttl = SESSION_POOL_TIME_LIMIT;
+                found->second.ttl = m_pool_time_limit_sec;
 		return session(found->second.session);
 	}
 
+        if ( m_pool_size_limit > 0 && ref->size() >= m_pool_size_limit )
+          throw too_many_session_error();
+
 	shared_session s(session_impl::create(*m_builder, addr, m_loop));
-	ref->insert( table_t::value_type(addr, entry_t(s, SESSION_POOL_TIME_LIMIT)) );
+	ref->insert( table_t::value_type(addr, entry_t(s, m_pool_time_limit_sec)) );
 
 	return session(s);
 }
@@ -105,6 +112,20 @@ void session_pool_impl::step_timeout()
 	}
 }
 
+void session_pool_impl::set_pool_time_limit(int limit_sec) {
+  table_ref ref(m_table);
+  m_pool_time_limit_sec = limit_sec;
+}
+
+void session_pool_impl::set_pool_size_limit(size_t limit) {
+  table_ref ref(m_table);
+  m_pool_size_limit = limit;
+}
+
+size_t session_pool_impl::get_pool_size() {
+  table_ref ref(m_table);
+  return ref->size();
+}
 
 session_pool::session_pool(loop lo) :
 	m_pimpl(new session_pool_impl(tcp_builder(), lo))
@@ -135,6 +156,20 @@ const loop& session_pool::get_loop() const
 loop session_pool::get_loop()
 	{ return m_pimpl->get_loop(); }
 
+void session_pool::set_pool_time_limit(int limit_sec)
+        { m_pimpl->set_pool_time_limit(limit_sec); }
+
+int session_pool::get_pool_time_limit()
+        { return m_pimpl->get_pool_time_limit(); }
+
+void session_pool::set_pool_size_limit(size_t limit)
+        { m_pimpl->set_pool_size_limit(limit); }
+
+size_t session_pool::get_pool_size_limit()
+        { return m_pimpl->get_pool_size_limit(); }
+
+size_t session_pool::get_pool_size()
+        { return m_pimpl->get_pool_size(); }
 
 }  // namespace rpc
 }  // namespace msgpack
