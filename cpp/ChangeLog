@@ -1,3 +1,8 @@
+2013-03-15 version 0.4.1:
+
+  * Add session::close()/open() feature
+  * Add configurable session-pool expire time and limit size
+
 2013-02-15 version 0.4.0-p1:
 
   * Fix configure.in for clang with -O4 option

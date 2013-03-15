@@ -70,14 +70,19 @@ public:
 public:
 	void send_data(sbuffer* sbuf);
 	void send_data(auto_vreflife vbuf);
+        void close();
 
 private:
 	session_impl* m_session;
+        address m_addr;
 	mp::shared_ptr<client_socket> m_sock;
 
 private:
 	client_transport();
 	client_transport(const client_transport&);
+
+        void try_connect();
+        void close_sock();
 };
 
 
@@ -99,16 +104,25 @@ void client_socket::on_response(msgid_t msgid,
 
 
 client_transport::client_transport(session_impl* s, const address& addr, const unix_builder& b) :
-	m_session(s)
+  m_session(s),
+  m_addr(addr) {
+  try_connect();
+}
+
+client_transport::~client_transport()
 {
+  close_sock();
+}
+
+void client_transport::try_connect() {
 	int fd = ::socket(PF_LOCAL, SOCK_STREAM, 0);
 	if(fd < 0) {
 		throw mp::system_error(errno, "failed to open UNIX socket");
 	}
 
 	try {
-		char addrbuf[addr.get_addrlen()];
-		addr.get_addr((sockaddr*)addrbuf);
+		char addrbuf[m_addr.get_addrlen()];
+		m_addr.get_addr((sockaddr*)addrbuf);
 
 		if(::connect(fd, (sockaddr*)addrbuf, sizeof(addrbuf)) < 0) {
 			throw mp::system_error(errno, "failed to connect UNIX socket");
@@ -122,19 +136,25 @@ client_transport::client_transport(session_impl* s, const address& addr, const u
 	}
 }
 
-client_transport::~client_transport()
-{
-	m_sock->remove_handler();
+void client_transport::close() {
+  close_sock();
+}
+
+void client_transport::close_sock() {
+  m_sock->remove_handler();
+  m_sock.reset();
 }
 
 void client_transport::send_data(sbuffer* sbuf)
 {
-	m_sock->send_data(sbuf);
+  if ( !m_sock ) try_connect();
+  m_sock->send_data(sbuf);
 }
 
 void client_transport::send_data(auto_vreflife vbuf)
 {
-	m_sock->send_data(vbuf);
+  if ( !m_sock ) try_connect();
+  m_sock->send_data(vbuf);
 }
 
 

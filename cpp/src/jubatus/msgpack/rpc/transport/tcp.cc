@@ -73,6 +73,7 @@ public:
 public:
 	void send_data(sbuffer* sbuf);
 	void send_data(auto_vreflife vbuf);
+        void close();
 
 private:
 	typedef std::vector<client_socket*> sockpool_t;
@@ -101,6 +102,7 @@ private:
 
 	friend class client_socket;
 	void on_close(client_socket* sock);
+        void clear_sockpool();
 
 private:
 	client_transport();
@@ -164,18 +166,7 @@ client_transport::client_transport(session_impl* s, const address& addr, const t
 
 client_transport::~client_transport()
 {
-	// avoids dead lock
-	sockpool_t sockpool;
-
-	{
-		sync_ref ref(m_sync);
-		sockpool.swap(ref->sockpool);
-
-		for(sockpool_t::iterator it(sockpool.begin()), it_end(sockpool.end());
-				it != it_end; ++it) {
-			(*it)->remove_handler();
-		}
-	}
+  clear_sockpool();
 }
 
 inline void client_transport::on_connect_success(int fd, sync_ref& ref)
@@ -312,6 +303,24 @@ void client_transport::send_data(auto_vreflife vbuf)
 		// FIXME pesudo connecting load balance
 		client_socket* sock = ref->sockpool[0];
 		sock->send_data(vbuf);
+	}
+}
+
+void client_transport::close() {
+  clear_sockpool();
+}
+
+void client_transport::clear_sockpool() {
+        // avoids dead lock
+        sockpool_t sockpool;
+	{
+          sync_ref ref(m_sync);
+          sockpool.swap(ref->sockpool);
+        }
+
+        for(sockpool_t::iterator it(sockpool.begin()), it_end(sockpool.end());
+            it != it_end; ++it) {
+          (*it)->remove_handler();
 	}
 }
 

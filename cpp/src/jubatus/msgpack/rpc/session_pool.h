@@ -47,6 +47,12 @@ public:
 	const loop& get_loop() const;
 	loop get_loop();
 
+        void set_pool_time_limit(int limit_sec);
+        int get_pool_time_limit();
+        void set_pool_size_limit(size_t limit);
+        size_t get_pool_size_limit();
+        size_t get_pool_size();
+
 protected:
 	session_pool(shared_session_pool pimpl);
 	shared_session_pool m_pimpl;

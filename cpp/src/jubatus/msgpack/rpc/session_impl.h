@@ -83,6 +83,9 @@ public:
         void cancel( msgid_t msgid );
         void cancel( msgid_t msgid, object reason );
 
+        void open();
+        void close();
+
 private:
 	address m_addr;
 
@@ -98,6 +101,8 @@ private:
 private:
 	session_impl();
 	session_impl(const session_impl&);
+
+        void remove_all_requests( msgpack::object reason );
 };
 
 
