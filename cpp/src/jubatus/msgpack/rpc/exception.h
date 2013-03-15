@@ -42,10 +42,10 @@ struct timeout_error : rpc_error {
 };
 
 struct too_many_session_error: rpc_error {
-        too_many_session_error():
-                rpc_error("too many session") {}
-        too_many_session_error(const std::string& msg) :
-                rpc_error(msg) {}
+	too_many_session_error():
+		rpc_error("too many session") {}
+	too_many_session_error(const std::string& msg) :
+		rpc_error(msg) {}
 };
 
 struct connect_error : timeout_error {

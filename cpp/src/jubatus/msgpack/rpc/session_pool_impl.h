@@ -50,13 +50,13 @@ public:
 	const loop& get_loop_ref() const
 		{ return m_loop; }
 
-        void set_pool_time_limit(int limit_sec);
-        int get_pool_time_limit()
-                { return m_pool_time_limit_sec; }
-        void set_pool_size_limit(size_t limit);
-        size_t get_pool_size_limit()
-                { return m_pool_size_limit; }
-        size_t get_pool_size();
+	void set_pool_time_limit(int limit_sec);
+	int get_pool_time_limit()
+		{ return m_pool_time_limit_sec; }
+	void set_pool_size_limit(size_t limit);
+	size_t get_pool_size_limit()
+		{ return m_pool_size_limit; }
+	size_t get_pool_size();
 
 public:
 	void step_timeout();
@@ -78,8 +78,8 @@ private:
 
 	std::auto_ptr<builder> m_builder;
 
-        int m_pool_time_limit_sec;
-        size_t m_pool_size_limit;
+	int m_pool_time_limit_sec;
+	size_t m_pool_size_limit;
 
 private:
 	session_pool_impl(const session_pool_impl&);
