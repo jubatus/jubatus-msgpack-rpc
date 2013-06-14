@@ -63,12 +63,10 @@ public:
 
 	bool step_timeout()
 	{
-		if(m_timeout > 0) {
-			--m_timeout;
-			return false;
-		} else {
-			return true;
-		}
+		if(m_timeout == 0) return false;
+
+		--m_timeout;
+		if(m_timeout == 0) return true; else return false;
 	}
 
         void cancel();
