@@ -28,6 +28,7 @@ namespace rpc {
 
 class dispatcher {
 public:
+	virtual ~dispatcher() {}
 	virtual void dispatch(request req) = 0;
 };
 
