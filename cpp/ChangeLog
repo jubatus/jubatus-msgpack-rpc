@@ -1,3 +1,8 @@
+2013-06-21 version 0.4.2:
+
+  * Added disabling session timeout feature
+  * Added a virtual destructor to msgpack::rpc::dispatcher
+
 2013-03-15 version 0.4.1:
 
   * Add session::close()/open() feature
