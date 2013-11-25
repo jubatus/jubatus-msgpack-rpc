@@ -39,8 +39,6 @@ namespace tcp {
 
 namespace {
 
-using namespace mp::placeholders;
-
 class client_transport;
 class server_transport;
 
@@ -231,6 +229,34 @@ void client_transport::on_connect(int fd, int err, weak_session ws, client_trans
 	self->on_connect_failed(err, ref);
 }
 
+namespace {
+template <class F>
+class on_connect_binder {
+public:
+	on_connect_binder(F f, weak_session session, client_transport* transport) :
+		m_f(f),
+		m_session(session),
+		m_transport(transport)
+	{ }
+
+	void operator()(int fd, int err) {
+		m_f(fd, err, m_session, m_transport);
+	}
+
+private:
+	F m_f;
+	weak_session m_session;
+	client_transport* m_transport;
+};
+
+template <class F>
+on_connect_binder<F>
+on_connect_bind(F f, weak_session session, client_transport* transport)
+{
+	return on_connect_binder<F>(f, session, transport);
+}
+}
+
 void client_transport::try_connect(sync_ref& lk_ref)
 {
 	address addr = m_session->get_address();
@@ -244,11 +270,10 @@ void client_transport::try_connect(sync_ref& lk_ref)
 			PF_INET, SOCK_STREAM, 0,
 			(sockaddr*)addrbuf, sizeof(addrbuf),
 			m_connect_timeout,
-			mp::bind(
-				&client_transport::on_connect,
-				_1, _2,
-				weak_session(m_session->shared_from_this()), this
-				));
+			on_connect_bind(
+				client_transport::on_connect,
+				weak_session(m_session->shared_from_this()),
+				this));
 }
 
 void client_transport::on_close(client_socket* sock)
@@ -385,13 +410,33 @@ server_socket::~server_socket() {
   cancel_server_timeout();
 }
 
+namespace {
+class on_server_timeout_binder {
+public:
+	on_server_timeout_binder(mp::shared_ptr<mp::wavy::handler> base_handler,
+			weak_server wsvr) :
+		m_base_handler(base_handler),
+		m_wsvr(wsvr)
+	{ }
+
+	bool operator()()
+	{
+	return server_socket::on_server_timeout(m_base_handler, m_wsvr);
+	}
+
+private:
+	mp::shared_ptr<mp::wavy::handler> m_base_handler;
+	weak_server m_wsvr;
+};
+}
+
 int server_socket::start_server_timeout( weak_server &wsvr ) {
   shared_server svr = wsvr.lock();
   if ( svr && svr->get_server_timeout() > 0 ) {
     this->m_timer_id = 
       svr->get_loop_ref()->add_timer( svr->get_server_timeout(),
                                       0,
-                                      mp::bind(&server_socket::on_server_timeout, shared_from_this(), wsvr));
+                                      on_server_timeout_binder(shared_from_this(), wsvr));
   } else {
     this->m_timer_id = -1;
   }
@@ -462,6 +507,23 @@ void server_socket::abandan_client_connection(weak_server wsvr) {
   }
 }
 
+namespace {
+class on_accept_binder {
+public:
+	explicit on_accept_binder(weak_server wsvr) :
+		m_wsvr(wsvr)
+	{ }
+
+	void operator()(int fd, int err)
+	{
+		server_transport::on_accept(fd, err, m_wsvr);
+	}
+
+private:
+	weak_server m_wsvr;
+};
+}
+
 server_transport::server_transport(server_impl* svr, const address& addr) :
 	m_lsock(-1), m_loop(svr->get_loop_ref())
 {
@@ -471,11 +533,9 @@ server_transport::server_transport(server_impl* svr, const address& addr) :
 	m_lsock = m_loop->listen(
 			PF_INET, SOCK_STREAM, 0,
 			(sockaddr*)addrbuf, sizeof(addrbuf),
-			mp::bind(
-				&server_transport::on_accept,
-				_1, _2,
-				weak_server(mp::static_pointer_cast<server_impl>(svr->shared_from_this()))
-				));
+			on_accept_binder(weak_server(
+				mp::static_pointer_cast<server_impl>(
+					svr->shared_from_this()))));
 }
 
 server_transport::~server_transport()
