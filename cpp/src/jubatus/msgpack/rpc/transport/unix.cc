@@ -38,6 +38,9 @@ namespace unix {
 
 namespace {
 
+using namespace mp::placeholders;
+
+
 class client_transport;
 class server_transport;
 
@@ -222,22 +225,6 @@ void server_socket::on_notify(
 	svr->on_notify(method, params, z);
 }
 
-namespace {
-class on_accept_binder {
-public:
-	explicit on_accept_binder(weak_server wsvr) :
-		m_wsvr(wsvr)
-	{ }
-
-	void operator()(int fd, int err)
-	{
-		server_transport::on_accept(fd, err, m_wsvr);
-	}
-
-private:
-	weak_server m_wsvr;
-};
-}
 
 server_transport::server_transport(server_impl* svr, const address& addr) :
 	m_lsock(-1), m_loop(svr->get_loop_ref())
@@ -248,9 +235,11 @@ server_transport::server_transport(server_impl* svr, const address& addr) :
 	m_lsock = m_loop->listen(
 			PF_LOCAL, SOCK_STREAM, 0,
 			(sockaddr*)&addrbuf, sizeof(addrbuf),
-			on_accept_binder(weak_server(
-				mp::static_pointer_cast<server_impl>(
-					svr->shared_from_this()))));
+			mp::bind(
+				&server_transport::on_accept,
+				_1, _2,
+				weak_server(mp::static_pointer_cast<server_impl>(svr->shared_from_this()))
+				));
 }
 
 server_transport::~server_transport()

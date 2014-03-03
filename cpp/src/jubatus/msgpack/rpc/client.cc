@@ -29,38 +29,12 @@ MP_UTIL_DEF(client) {
 	static bool step_timeout(weak_session ws);
 };
 
-namespace {
-template <class F>
-class step_timeout_binder {
-public:
-    step_timeout_binder(F f, weak_session ws) :
-        m_f(f),
-        m_ws(ws)
-    { }
-
-    bool operator()() {
-        return m_f(m_ws);
-        // return MP_UTIL_IMPL(client)::step_timeout(m_ws);
-    }
-
-private:
-    F m_f;
-    weak_session m_ws;
-};
-
-template <class F>
-step_timeout_binder<F>
-step_timeout_bind(F f, weak_session ws)
-{
-    return step_timeout_binder<F>(f, ws);
-}
-}
-
 void MP_UTIL_IMPL(client)::start_timeout()
 {
-	m_pimpl->get_loop_ref()->add_timer(1.0, 1.0,
-				step_timeout_bind(MP_UTIL_IMPL(client)::step_timeout,
-				session::m_pimpl));
+	m_pimpl->get_loop_ref()->add_timer(1.0, 1.0, mp::bind(
+				&MP_UTIL_IMPL(client)::step_timeout,
+				weak_session(session::m_pimpl)
+				));
 }
 
 bool MP_UTIL_IMPL(client)::step_timeout(weak_session ws)

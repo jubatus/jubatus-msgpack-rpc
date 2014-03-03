@@ -32,6 +32,8 @@ namespace udp {
 
 namespace {
 
+using namespace mp::placeholders;
+
 class client_transport;
 class server_transport;
 
