@@ -10,7 +10,7 @@ AM_LDFLAGS = \
 
 check_HEADERS = \
 		echo_server.h \
-                attack.h
+		attack.h
 
 check_PROGRAMS = \
 		sync_call \
