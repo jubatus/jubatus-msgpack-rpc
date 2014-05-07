@@ -9,7 +9,8 @@ AM_LDFLAGS = \
 		-ljubatus_mpio -lmsgpack
 
 check_HEADERS = \
-		echo_server.h
+		echo_server.h \
+                attack.h
 
 check_PROGRAMS = \
 		sync_call \
