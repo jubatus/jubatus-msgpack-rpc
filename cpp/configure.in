@@ -8,23 +8,6 @@ AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE(jubatus_msgpack-rpc, 0.4.2)
 AC_CONFIG_HEADER(config.h)
 
-# Default enabled -O4
-AC_ARG_ENABLE(optimized, AS_HELP_STRING([--disable-optimized], [Compile with optimizations -O4 (default is enable)]))
-# Check compiler driver can link -O4 generated file(for clang)
-AS_IF([test "x$enable_optimized" != "xno"], [
-	# Use default flag with -O3 -Wall
-	save_c_flags="$CFLAGS"
-	save_cxx_flags="$CXXFLAGS"
-	CFLAGS="-Wall"
-	CXXFLAGS="-Wall"
-	AC_LANG_PUSH([C])
-	AX_CHECK_LINK_FLAG(-O4, [CFLAGS="-O4 $CFLAGS"], [CFLAGS="$CFLAGS $save_c_flags"])
-	AC_LANG_POP([C])
-	AC_LANG_PUSH([C++])
-	AX_CHECK_LINK_FLAG(-O4, [CXXFLAGS="-O4 $CXXFLAGS"], [CXXFLAGS="$CXXFLAGS $save_cxx_flags"])
-	AC_LANG_POP([C++])
-])
-
 AC_PROG_CC
 AC_PROG_CXX
 
