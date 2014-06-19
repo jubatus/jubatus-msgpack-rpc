@@ -1,7 +1,6 @@
 # Copyright (C) 2013 Preferred Infrastructure and Nippon Telegraph and Telephone Corporation.
 
 AC_INIT(src/jubatus/msgpack/rpc/session.h)
-m4_include(m4/ax_check_link_flag.m4)
 AC_CONFIG_AUX_DIR(ac)
 AC_CANONICAL_TARGET
 
