@@ -38,6 +38,8 @@ public:
 	session get_session(const std::string& host, uint16_t port)
 		{ return get_session(ip_address(host, port)); }
 
+	void remove_session(const session& sess);
+
 	loop get_loop()
 		{ return m_loop; }
 
