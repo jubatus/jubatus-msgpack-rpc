@@ -80,6 +80,18 @@ session session_pool_impl::get_session(const address& addr)
 	return session(s);
 }
 
+void session_pool_impl::remove_session(const session& sess)
+{
+	table_ref ref(m_table);
+	for(table_t::iterator it(ref->begin()); it != ref->end(); ++it) {
+		if (session(it->second.session) == sess) {
+			ref->erase(it);
+			return;
+		}
+	}
+	return;
+}
+
 void session_pool_impl::step_timeout()
 {
 	std::vector<shared_future> timedout;
@@ -148,6 +160,9 @@ session_pool::~session_pool() { }
 
 session session_pool::get_session(const address& addr)
 	{ return m_pimpl->get_session(addr); }
+
+void session_pool::remove_session(const session& sess)
+	{ m_pimpl->remove_session(sess); }
 
 const loop& session_pool::get_loop() const
 	{ return const_cast<const session_pool_impl*>(m_pimpl.get())->get_loop(); }
