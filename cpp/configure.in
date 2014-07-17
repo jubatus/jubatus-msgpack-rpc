@@ -14,6 +14,7 @@ AC_PROG_LIBTOOL
 AM_PROG_AS
 AM_PROG_CC_C_O
 
+AC_SUBST([AM_CXXFLAGS], [-pthread])
 
 AC_CACHE_CHECK([for __sync_* atomic operations], msgpackrpc_cv_atomic_ops, [
 	AC_TRY_LINK([
