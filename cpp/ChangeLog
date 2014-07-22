@@ -1,3 +1,10 @@
+2014-07-22 version 0.4.3:
+
+  * Fixed Makefile for test (#10).
+  * Stopped using -O4 (#11).
+  * Added -pthread to compilation option (#12).
+  * Added remove_session function to session_pool (#14).
+
 2013-06-21 version 0.4.2:
 
   * Added disabling session timeout feature
