@@ -44,6 +44,8 @@ public:
 	session get_session(const std::string& host, uint16_t port)
 		{ return get_session(ip_address(host, port)); }
 
+	void remove_session(const session& sess);
+
 	const loop& get_loop() const;
 	loop get_loop();
 

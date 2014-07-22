@@ -6,10 +6,11 @@ AM_C_CPPFLAGS = -I../src
 AM_LDFLAGS = \
 		../src/cclog/libjubatus_cclog.la \
 		../src/jubatus/msgpack/rpc/libjubatus_msgpack-rpc.la \
-		-ljubatus_mpio -msgpack
+		-ljubatus_mpio -lmsgpack
 
 check_HEADERS = \
-		echo_server.h
+		echo_server.h \
+		attack.h
 
 check_PROGRAMS = \
 		sync_call \

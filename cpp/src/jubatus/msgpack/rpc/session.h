@@ -46,6 +46,11 @@ public:
         void open();
         void close();
 
+	inline bool operator== (const session& o) const
+	{
+		return m_pimpl == o.m_pimpl;
+	}
+
 protected:
 	template <typename Method, typename Parameter>
 	future send_request(Method method,
