@@ -502,7 +502,7 @@ void server_transport::on_accept(int fd, int err, weak_server wsvr)
 	}
 
 	if(fd < 0) {
-		LOG_DEBUG("accept failed");
+		LOG_ERROR("accept failed");
 		return;
 	}
 	LOG_TRACE("accepted fd=",fd);
