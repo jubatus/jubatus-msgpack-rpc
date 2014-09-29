@@ -4,7 +4,7 @@ AC_INIT(src/jubatus/msgpack/rpc/session.h)
 AC_CONFIG_AUX_DIR(ac)
 AC_CANONICAL_TARGET
 
-AM_INIT_AUTOMAKE(jubatus_msgpack-rpc, 0.4.3)
+AM_INIT_AUTOMAKE(jubatus_msgpack-rpc, 0.4.4)
 AC_CONFIG_HEADER(config.h)
 
 AC_PROG_CC
