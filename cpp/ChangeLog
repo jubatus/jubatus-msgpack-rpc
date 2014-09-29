@@ -1,3 +1,8 @@
+2014-09-29 version 0.4.4:
+
+  * Fix log level when accept is failed
+  * Show detailed error message when accept failed
+
 2014-07-22 version 0.4.3:
 
   * Fixed Makefile for test (#10).
