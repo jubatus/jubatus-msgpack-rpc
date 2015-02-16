@@ -1,4 +1,4 @@
-# Copyright (C) 2013 Preferred Infrastructure and Nippon Telegraph and Telephone Corporation.
+# Copyright (C) 2013 Preferred Networks and Nippon Telegraph and Telephone Corporation.
 
 lib_LTLIBRARIES = libjubatus_msgpack-rpc.la
 

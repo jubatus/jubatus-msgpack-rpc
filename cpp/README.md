@@ -97,7 +97,7 @@ IDL parser and code generator is under development. It will resolve the problem 
 ## License
 
     Copyright (C) 2008-2010 FURUHASHI Sadayuki <frsyuki _at_ users.sourceforge.jp>
-    Copyright (C) 2013 Preferred Infrastructure and Nippon Telegraph and Telephone Corporation.
+    Copyright (C) 2013 Preferred Networks and Nippon Telegraph and Telephone Corporation.
     
        Licensed under the Apache License, Version 2.0 (the "License");
        you may not use this file except in compliance with the License.

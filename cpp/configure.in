@@ -1,4 +1,4 @@
-# Copyright (C) 2013 Preferred Infrastructure and Nippon Telegraph and Telephone Corporation.
+# Copyright (C) 2013 Preferred Networks and Nippon Telegraph and Telephone Corporation.
 
 AC_INIT(src/jubatus/msgpack/rpc/session.h)
 AC_CONFIG_AUX_DIR(ac)
