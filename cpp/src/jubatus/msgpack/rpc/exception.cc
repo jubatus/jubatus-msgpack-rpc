@@ -56,20 +56,20 @@ void throw_exception(future_impl* f)
         //   caused by *local* errors. Otherwise, caused by
         //   *remote* errors or delivered errors from remote.
 
-	if(err.type == msgpack::type::RAW &&
-			err.via.raw.ptr == TIMEOUT_ERROR_PTR) {
+	if(err.type == msgpack::type::BIN &&
+			err.via.bin.ptr == TIMEOUT_ERROR_PTR) {
 		throw timeout_error();
 
-	} else if(err.type == msgpack::type::RAW &&
-			err.via.raw.ptr == CONNECT_ERROR_PTR) {
+	} else if(err.type == msgpack::type::BIN &&
+			err.via.bin.ptr == CONNECT_ERROR_PTR) {
 		throw connect_error();
 
-        } else if(err.type == msgpack::type::RAW &&
-			err.via.raw.ptr == REQUEST_CANCELLED_PTR) {
+        } else if(err.type == msgpack::type::BIN &&
+			err.via.bin.ptr == REQUEST_CANCELLED_PTR) {
 		throw request_cancelled();
 
-        } else if(err.type == msgpack::type::RAW &&
-			err.via.raw.ptr == CONNECTION_CLOSED_ERROR_PTR) {
+        } else if(err.type == msgpack::type::BIN &&
+			err.via.bin.ptr == CONNECTION_CLOSED_ERROR_PTR) {
 		throw connection_closed_error();
 
         } else if(err.type == msgpack::type::NEGATIVE_INTEGER ) {
@@ -87,11 +87,11 @@ void throw_exception(future_impl* f)
 			err.via.u64 == ARGUMENT_ERROR) {
 		throw argument_error();
 
-        } else if ( err.type == msgpack::type::RAW ) {
+        } else if ( err.type == msgpack::type::BIN ) {
           // maybe simple error message
           
           std::ostringstream os;
-          os.write(err.via.raw.ptr, err.via.raw.size);
+          os.write(err.via.bin.ptr, err.via.bin.size);
           throw remote_error(os.str(), future(f->shared_from_this()));
 
 	} else {

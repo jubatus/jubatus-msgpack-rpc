@@ -144,8 +144,10 @@ private:
 template <typename MixIn>
 inline stream_handler<MixIn>::stream_handler(int fd, loop lo) :
 	mp::wavy::handler(fd),
-	m_pac(MSGPACK_RPC_STREAM_BUFFER_SIZE),
-	m_loop(lo) { }
+	m_loop(lo)
+	{
+		m_pac.reserve_buffer(MSGPACK_RPC_STREAM_BUFFER_SIZE);
+	}
 
 template <typename MixIn>
 inline stream_handler<MixIn>::~stream_handler() { }
