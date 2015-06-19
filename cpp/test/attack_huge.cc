@@ -45,7 +45,7 @@ int main(void)
 		<< std::endl;
 
 	msglife.reset(new msgpack::zone());
-	msg = raw_ref((char*)msglife->malloc(ATTACK_SIZE), ATTACK_SIZE);
+	msg = raw_ref((char*)msglife->allocate_align(ATTACK_SIZE), ATTACK_SIZE);
 
 	test.reset(new attacker());
 	test->run(ATTACK_THREAD, &attack_huge);

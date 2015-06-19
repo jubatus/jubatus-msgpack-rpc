@@ -37,7 +37,7 @@ void attack_callback()
 		s.set_timeout(30.0);
 
 		rpc::shared_zone msglife(new msgpack::zone());
-		raw_ref msg = raw_ref((char*)msglife->malloc(ATTACK_SIZE), ATTACK_SIZE);
+		raw_ref msg = raw_ref((char*)msglife->allocate_align(ATTACK_SIZE), ATTACK_SIZE);
 
 		for(size_t j=0; j < ATTACK_DEPTH; ++j) {
 			pipeline[j] = s.call("echo_huge", msglife, msg).attach_callback(
