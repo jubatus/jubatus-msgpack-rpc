@@ -7,7 +7,7 @@ AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE(jubatus_msgpack-rpc, 0.4.3)
 AC_CONFIG_HEADER(config.h)
 
-AC_PROG_CC
+AC_LANG(C++)
 AC_PROG_CXX
 
 AC_PROG_LIBTOOL
@@ -43,7 +43,6 @@ AC_ARG_WITH([msgpack],
 if test "$msgpack_path" != ""; then
 	CXXFLAGS="$CXXFLAGS -I$msgpack_path/include"
 	CFLAGS="$CFLAGS -I$msgpack_path/include"
-	LDFLAGS="$LDFLAGS -L$msgpack_path/lib"
 fi
 
 
@@ -63,8 +62,8 @@ AC_CHECK_LIB(stdc++, main)
 AC_CHECK_LIB(pthread,pthread_create,,
 	AC_MSG_ERROR([Can't find pthread library]))
 
-AC_CHECK_LIB(msgpack,main,,
-	AC_MSG_ERROR([Can't find msgpack library.
+AC_CHECK_HEADER(msgpack.hpp,,
+	AC_MSG_ERROR([Can't find msgpack cpp header.
 --with-msgpack=DIR option may be needed.]))
 
 AC_CHECK_LIB(jubatus_mpio,main,,
