@@ -1,0 +1,73 @@
+language: cpp
+
+compiler:
+# gcc test is disabled (see Jubatus issue #120)
+#  - gcc
+  - clang
+
+before_install:
+  - lsb_release -a
+  - uname -a
+  - sudo apt-get -qq update
+
+install:
+  # msgpack
+  - sudo apt-get -qq install libmsgpack-dev
+  # jubatus-mpio
+  - git clone https://github.com/jubatus/jubatus-mpio.git
+  - pushd jubatus-mpio && git checkout develop && ./bootstrap && ./configure && make && sudo make install && popd
+  - sudo ldconfig
+  # glog
+  - wget http://google-glog.googlecode.com/files/glog-0.3.3.tar.gz && tar xf glog-0.3.3.tar.gz
+  - pushd glog-0.3.3 && ./configure && make && sudo make install && popd
+  - sudo ldconfig
+  # zookeeper
+  - wget http://apache.openmirror.de/zookeeper/zookeeper-3.4.5/zookeeper-3.4.5.tar.gz && tar xf zookeeper-3.4.5.tar.gz
+  - pushd zookeeper-3.4.5/src/c && ./configure && make && sudo make install && popd
+  - sudo ldconfig
+  # oniguruma
+  - wget http://www.geocities.jp/kosako3/oniguruma/archive/onig-5.9.4.tar.gz && tar xvf onig-5.9.4.tar.gz
+  - pushd onig-5.9.4 && ./configure && make && sudo make install && popd
+  - sudo ldconfig
+  # re2
+  - hg clone https://re2.googlecode.com/hg re2
+  - pushd re2 && make && sudo make install && popd
+  - sudo ldconfig
+  # ux
+  - wget http://ux-trie.googlecode.com/files/ux-0.1.9.tar.bz2 && tar xf ux-0.1.9.tar.bz2
+  - pushd ux-0.1.9 && ./waf configure && ./waf build && sudo ./waf install && popd
+  - sudo ldconfig
+  # mecab
+  - wget http://mecab.googlecode.com/files/mecab-0.996.tar.gz && tar xf mecab-0.996.tar.gz
+  - pushd mecab-0.996 && ./configure --enable-utf8-only && make && sudo make install && popd
+  - sudo ldconfig
+  # mecab-ipadic
+  - wget http://mecab.googlecode.com/files/mecab-ipadic-2.7.0-20070801.tar.gz && tar xf mecab-ipadic-2.7.0-20070801.tar.gz
+  - pushd mecab-ipadic-2.7.0-20070801 && ./configure --with-charset=utf8 && make && sudo make install && popd
+  - sudo ldconfig
+
+script:
+  # jubatus-msgpack-rpc
+  - pushd cpp
+  - ./bootstrap
+  - ./configure --with-jubatus-mpio=/usr/local
+  - make && sudo make install
+  - popd
+  - sudo ldconfig
+  # jubatus
+  - mkdir depends_on_jubatus_msgpack_rpc
+  - cd depends_on_jubatus_msgpack_rpc
+  - git clone https://github.com/jubatus/jubatus.git
+  - pushd jubatus
+  - git checkout develop
+  - ./waf configure --enable-zookeeper --enable-mecab --enable-ux
+  - ./waf build --checkall
+  - popd
+
+branches:
+  only:
+    - master
+    - develop
+
+notifications:
+  email: false
