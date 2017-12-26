@@ -132,7 +132,10 @@ AC_MSG_RESULT($enable_trace)
 
 AM_CONDITIONAL(WANT_CCLOG, test "$want_cclog" = "yes")
 
-
+AC_LANG(C++)
+jubatus_msgpack_rpc_cxxflags_backup="$CXXFLAGS"
+CXXFLAGS="$CXXFLAGS -std=c++11 -Wno-deprecated-declarations"
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM()],,CXXFLAGS="$jubatus_msgpack_rpc_cxxflags_backup")
 
 major=`echo $VERSION | sed 's/\([[0-9]]*\)\.\([[0-9]]*\).*/\1/'`
 minor=`echo $VERSION | sed 's/\([[0-9]]*\)\.\([[0-9]]*\).*/\2/'`
